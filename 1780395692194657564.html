@@ -1,0 +1,1868 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Cinzel:wght@300;400&display=swap" rel="stylesheet">
+    <title>Collection | Blue Diamond Jewellery</title>
+    <style>
+        :root {
+            --gold: #C5A059;
+            --black: #0a0a0a;
+            --paper: #fcfaf7;
+            --muted: #999;
+            --border: #e8e2d9;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        /* Gold scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: rgba(197, 160, 89, 0.05); }
+        ::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 10px; border: 1px solid rgba(0,0,0,0.1); }
+        ::-webkit-scrollbar-thumb:hover { background: #b08e4d; }
+        * { scrollbar-width: thin; scrollbar-color: #C5A059 transparent; }
+
+        body {
+            background: #000;
+            font-family: 'Times New Roman', Times, serif;
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        /* ── Loading Screen ── */
+        #loading-screen {
+            position: fixed; inset: 0;
+            background: #080706;
+            z-index: 9999;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            transition: opacity 0.8s ease-out;
+        }
+        .loading-vignette { position: absolute; inset: 0; background: radial-gradient(circle at center, transparent 0%, rgba(0,0,0,0.8) 100%); }
+        .loading-content { position: relative; z-index: 10; text-align: center; }
+        .loading-text { font-family: 'Cinzel', serif; color: var(--gold); letter-spacing: 8px; font-size: 0.8rem; text-transform: uppercase; animation: pulse 2s infinite; }
+        .loading-bar-container { width: 120px; height: 1px; background: rgba(197,160,89,0.2); margin: 20px auto; position: relative; overflow: hidden; }
+        .loading-bar { position: absolute; left: -100%; width: 100%; height: 100%; background: var(--gold); animation: loading 2s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
+        @keyframes loading { 0% { left: -100%; } 100% { left: 100%; } }
+
+        /* ── Shared Typography ──────────────────────── */
+        .exquisite-label {
+            display: block;
+            color: var(--gold);
+            letter-spacing: 3px;
+            font-size: 0.6rem;
+            text-transform: uppercase;
+            font-family: sans-serif;
+            margin-bottom: 10px;
+        }
+        .product-title {
+            color: #111;
+            font-weight: normal;
+            font-size: 1.35rem;
+            line-height: 1.3;
+            margin-bottom: 5px;
+        }
+        .product-ref {
+            color: var(--muted);
+            font-size: 0.55rem;
+            font-family: sans-serif;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+        .gold-accent-line {
+            width: 36px; height: 1px;
+            background: var(--gold);
+            margin: 18px 0;
+        }
+        .gold-accent-line.centered { margin-left: auto; margin-right: auto; }
+
+        /* ── Shared Buttons ─────────────────────────── */
+        .btn {
+            padding: 14px;
+            cursor: pointer;
+            transition: background 0.25s, color 0.25s, border-color 0.25s;
+            font-family: sans-serif;
+            font-size: 0.6rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            border: 1px solid var(--gold);
+        }
+        .btn-primary {
+            width: 100%;
+            background: var(--black);
+            color: #fff;
+            border-color: var(--black);
+            margin-bottom: 9px;
+        }
+        .btn-primary:hover { background: var(--gold); border-color: var(--gold); }
+        .btn-secondary { width: 100%; background: transparent; color: var(--black); border-color: var(--black); transition: all 0.3s; }
+        .btn-secondary:hover { background: var(--gold); color: #fff; border-color: var(--gold); }
+        .btn-secondary-mobile { width: 100%; background: transparent; color: var(--black); border-color: var(--black); margin-top: 10px; }
+
+        .button-group { margin-top: 20px; display: flex; flex-direction: column; gap: 8px; }
+        .secondary-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .view-cart-link { text-align: center; font-size: 0.65rem; color: var(--gold); text-decoration: underline; cursor: pointer; margin-top: 12px; font-family: sans-serif; letter-spacing: 1px; text-transform: uppercase; }
+
+        /* ── Vendor tags ────────────────────────────── */
+        .vendor-tag, .vendor-overlay-box {
+            position: absolute;
+            top: 16px; left: 16px;
+            background: #fff;
+            padding: 7px 14px;
+            color: var(--gold);
+            font-family: sans-serif;
+            font-size: 0.5rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            border: 1px solid #f0ece6;
+            z-index: 5;
+        }
+
+        /* ── Accordions (shared) ────────────────────── */
+        .accordion { border-top: 1px solid var(--border); }
+        .accordion:last-of-type { border-bottom: 1px solid var(--border); }
+        .accordion summary {
+            list-style: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            font-family: sans-serif;
+            font-size: 0.58rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--gold);
+            cursor: pointer;
+            outline: none;
+            user-select: none;
+        }
+        .accordion summary::-webkit-details-marker { display: none; }
+        .accordion summary::after { content: '+'; font-size: 1rem; }
+        .accordion[open] summary::after { content: '−'; }
+        .accordion p {
+            font-size: 0.78rem;
+            color: #666;
+            line-height: 1.65;
+            padding-bottom: 12px;
+        }
+
+        /* ── Luxury Cart Item Styles ── */
+        .cart-page { background: var(--paper); height: 100%; padding: 40px; display: flex; flex-direction: column; position: relative; }
+        .chapter-label { display: block; font-family: sans-serif; font-size: 0.6rem; letter-spacing: 4px; color: var(--gold); margin-bottom: 15px; text-align: center; }
+        .chapter-title { font-family: 'Cinzel', serif; font-size: 1.8rem; color: #111; letter-spacing: 4px; text-align: center; }
+        .cart-items-container { margin-top: 30px; display: flex; flex-direction: column; gap: 15px; flex: 1; overflow-y: auto; padding-right: 5px; }
+        .cart-item { display: flex; gap: 15px; padding: 15px; background: #fff; border: 1px solid var(--border); align-items: center; cursor: pointer; transition: all 0.2s; position: relative; width: 100%; }
+        .cart-item:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.05); border-color: var(--gold); }
+        .cart-item-img { width: 80px; height: 80px; background-size: contain; background-repeat: no-repeat; background-position: center; flex-shrink: 0; border: 1px solid #eee; background-color: #fff; }
+        .cart-item-info { flex: 1; min-width: 0; }
+        .cart-item-info h4 { font-family: 'Cinzel', serif; font-size: 0.85rem; color: #111; font-weight: normal; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .cart-item-info p { font-size: 0.8rem; color: var(--gold); margin-bottom: 10px; font-weight: bold; }
+        .cart-item-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+        .cart-btn { padding: 8px 15px; font-size: 0.6rem; font-family: sans-serif; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; border: 1px solid #ddd; background: transparent; transition: all 0.3s; flex: 1; min-width: 80px; text-align: center; }
+        .cart-btn.gold { border-color: var(--gold); color: var(--gold); }
+        .cart-btn:hover { background: var(--gold); color: #fff; border-color: var(--gold); }
+        .empty-msg { text-align: center; color: #999; font-style: italic; margin-top: 40px; font-family: 'Cormorant Garamond', serif; width: 100%; }
+
+        /* Luxury Product Popup */
+        .luxury-popup { position: fixed; inset: 0; background: rgba(0,0,0,0.9); display: none; z-index: 2000; justify-content: center; align-items: center; backdrop-filter: blur(10px); }
+        .luxury-popup-content { background: var(--paper); width: 90%; max-width: 850px; display: flex; position: relative; animation: luxuryFadeIn 0.5s cubic-bezier(0.2, 0, 0.2, 1); max-height: 90vh; overflow: hidden; }
+        @keyframes luxuryFadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+        .luxury-popup-img { flex: 1; background-size: contain; background-repeat: no-repeat; background-position: center; background-color: #fff; border-right: 1px solid var(--border); }
+        .luxury-popup-details { flex: 1; padding: 45px; overflow-y: auto; display: flex; flex-direction: column; }
+        .luxury-close { position: absolute; top: 20px; right: 20px; background: rgba(255,255,255,0.8); border: 1px solid var(--gold); color: var(--gold); font-size: 1.8rem; cursor: pointer; z-index: 20; line-height: 1; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 50%; transition: all 0.3s; }
+        .luxury-close:hover { background: var(--gold); color: #fff; }
+
+        .end-page { background: var(--paper); height: 100%; display: flex; align-items: center; justify-content: center; text-align: center; padding: 40px; overflow-y: auto; position: relative; }
+        .end-inner { width: 100%; max-width: 500px; }
+        .end-logo { width: 60px; margin-bottom: 30px; filter: grayscale(1) brightness(0.2); }
+        .end-message { font-family: 'Cormorant Garamond', serif; font-size: 1.2rem; font-style: italic; color: #444; line-height: 1.6; margin-top: 20px; }
+
+        /* ════════════════════════════════════════════
+           LUXURY COVER
+        ════════════════════════════════════════════════════ */
+        .cover-page {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%; height: 100%;
+            position: relative;
+            overflow: hidden;
+            background: #080706;
+        }
+
+        .cover-vignette {
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(
+                ellipse 78% 72% at 50% 46%,
+                transparent 0%,
+                rgba(6,5,4,0.4) 50%,
+                rgba(0,0,0,0.88) 100%
+            );
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        .cover-page::before, .cart-page::before, .end-page::before {
+            content:'';
+            position:absolute;
+            top:0; left:0;
+            width:24px; height:100%;
+            background:linear-gradient(to right, #0a0806 0%, #3d2d14 38%, #2a1f0d 65%, #060503 100%);
+            border-right:1px solid rgba(197,160,89,0.4);
+            box-shadow:inset -2px 0 10px rgba(0,0,0,0.8), 2px 0 15px rgba(197,160,89,0.1);
+            z-index:6;
+            pointer-events:none;
+        }
+
+        .cover-page::after {
+            content:'';
+            position:absolute;
+            top:0; right:0;
+            width:10px; height:100%;
+            background:repeating-linear-gradient(to bottom, #2a2a2a 0px, #2a2a2a 1px, #3a3a3a 1px, #3a3a3a 2px);
+            border-left: 1px solid rgba(197,160,89,0.3);
+            box-shadow:-2px 0 10px rgba(0,0,0,0.8);
+            z-index:6;
+            pointer-events:none;
+        }
+
+        .cover-content {
+            position:relative;
+            z-index:10;
+            display:flex;
+            flex-direction:column;
+            align-items:center;
+            text-align:center;
+            padding:0 52px;
+            width:100%;
+        }
+
+        .cover-logo-hero {
+            width:80px; height:auto;
+            margin-bottom:26px;
+            filter:brightness(0) invert(1) sepia(1) saturate(0.4) brightness(1.1) drop-shadow(0 0 22px rgba(197,160,89,0.28));
+            opacity:1.0;
+        }
+
+        .cov-ornament {
+            display:flex;
+            align-items:center;
+            width:190px;
+            margin:22px auto;
+        }
+        .cov-ornament.narrow { width:130px; margin:18px auto; }
+        .cov-orn-line {
+            flex:1; height:1px;
+            background:linear-gradient(90deg,transparent,rgba(197,160,89,0.6));
+        }
+        .cov-orn-line.r {
+            background:linear-gradient(90deg,rgba(197,160,89,0.6),transparent);
+        }
+        .cov-orn-pip {
+            width:5px; height:5px;
+            border:1px solid rgba(197,160,89,0.78);
+            transform:rotate(45deg);
+            margin:0 10px;
+            flex-shrink:0;
+        }
+
+        .cov-t-blue {
+            font-family:'Cormorant Garamond','Times New Roman',Times,serif;
+            font-weight:300;
+            font-size:clamp(2.2rem, 5vw, 3.5rem);
+            letter-spacing:clamp(10px, 2vw, 18px);
+            text-indent:18px;
+            line-height:0.92;
+            margin:0;
+            color:#f0e8d8;
+            text-shadow:0 0 80px rgba(197,160,89,0.12);
+        }
+
+        .cov-t-diamond {
+            font-family:'Cinzel','Times New Roman',Times,serif;
+            font-weight:300;
+            font-size:clamp(2.2rem, 5vw, 3.5rem);
+            letter-spacing:clamp(10px, 2vw, 18px);
+            text-indent:18px;
+            line-height:1.15;
+            margin:8px 0 0;
+            background: linear-gradient(
+                100deg,
+                #8a6020 0%,
+                #c8a060 18%,
+                #f0d898 42%,
+                #fce8a8 50%,
+                #f0d898 58%,
+                #c8a060 78%,
+                #8a6020 100%
+            );
+            background-size: 200% 100%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: goldShimmer 5s ease-in-out infinite;
+        }
+
+        @keyframes goldShimmer {
+            0%, 100% { background-position: 100% 0; }
+            50% { background-position: 0% 0; }
+        }
+
+        .cov-jewellery {
+            font-family:sans-serif;
+            font-size:0.7rem;
+            letter-spacing:8px;
+            color:var(--gold);
+            margin-top:14px;
+            opacity:0.8;
+            font-weight:300;
+            text-transform: uppercase;
+        }
+
+        .cover-invite {
+            position:absolute;
+            bottom:8%;
+            z-index:10;
+            width:100%;
+            display:flex;
+            flex-direction:column;
+            align-items:center;
+        }
+
+        .cover-invite-line {
+            display:flex;
+            align-items:center;
+            width:240px;
+            margin-bottom:15px;
+        }
+
+        .cover-invite-rule {
+            flex:1; height:1px;
+            background:linear-gradient(90deg,transparent,rgba(197,160,89,0.4));
+        }
+
+        .cover-invite-rule.right {
+            background:linear-gradient(90deg,rgba(197,160,89,0.4),transparent);
+        }
+
+        .cover-invite-line p {
+            font-family:'Cormorant Garamond',serif;
+            font-size:0.85rem;
+            color:rgba(240,232,216,0.7);
+            margin:0 15px;
+            font-style:italic;
+        }
+
+        .chevron-pair {
+            display:flex;
+            gap:8px;
+            opacity:0.6;
+        }
+
+        .cover-chevron {
+            width:12px; height:12px;
+            border-right:1px solid var(--gold);
+            border-bottom:1px solid var(--gold);
+            transform:rotate(-45deg);
+            animation:chevronPulse 2s infinite;
+        }
+
+        @keyframes chevronPulse {
+            0% { opacity:0.2; transform:translateX(-5px) rotate(-45deg); }
+            50% { opacity:1; transform:translateX(0) rotate(-45deg); }
+            100% { opacity:0.2; transform:translateX(5px) rotate(-45deg); }
+        }
+
+        @media (min-width: 901px) {
+            .mobile-wrapper { display: none; }
+            .desktop-wrapper {
+                width: 100vw; height: 100vh;
+                display: flex; justify-content: center; align-items: center;
+                background: #0a0a0a; overflow: hidden;
+            }
+            .page { background: #fff; box-shadow: inset 0 0 50px rgba(0,0,0,0.05); height: 100%; }
+            .details-side { background: var(--paper); height: 100%; position: relative; }
+            .scrollable-content { height: 100%; overflow-y: auto; padding: 45px 55px; -webkit-overflow-scrolling: touch; }
+            .page-header-row { display: flex; justify-content: space-between; align-items: baseline; border-bottom: 1px solid var(--border); padding-bottom: 12px; margin-bottom: 25px; }
+            .page-counter { font-family: 'Cinzel', serif; font-size: 0.75rem; color: #bbb; letter-spacing: 1px; }
+            .page-counter em { font-style: normal; color: var(--gold); margin: 0 4px; }
+            .image-side { height: 100%; background-size: contain; background-repeat: no-repeat; background-position: center; background-color: #fff; position: relative; }
+            .price-container { font-size: 1.8rem; margin: 20px 0 18px; border-top: 1px solid #eee; padding-top: 16px; color: #000; }
+            .narrative-box label { display: block; font-size: 0.55rem; color: var(--gold); font-family: sans-serif; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 8px; }
+            .narrative-box p { font-size: 0.95rem; color: #444; line-height: 1.7; margin-bottom: 24px; }
+            .center-spine-shadow { position: absolute; top: 0; left: 0; width: 40px; height: 100%; background: linear-gradient(to right, rgba(0,0,0,0.15) 0%, transparent 100%); pointer-events: none; }
+        }
+
+        @media (max-width: 900px) {
+            .desktop-wrapper { display: none; }
+            .mobile-wrapper { width: 100vw; height: 100vh; background: #000; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; }
+            #mobile-flipbook { margin-top: -20px; }
+            .mobile-page-wrap { width: 100%; height: 100%; display: flex; flex-direction: column; background: var(--paper); position: relative; overflow: hidden; }
+            .mobile-img-panel { height: 48%; background-size: contain; background-repeat: no-repeat; background-position: center; background-color: #fff; position: relative; border-bottom: 1px solid var(--border); }
+            .mobile-info-panel { height: 52%; padding: 25px; overflow-y: auto; display: flex; flex-direction: column; }
+            .mobile-pnum { position: absolute; bottom: 15px; right: 15px; font-family: 'Cinzel', serif; font-size: 0.7rem; color: #bbb; }
+            .mobile-pnum span { color: var(--gold); }
+            .price-display { font-size: 1.4rem; color: #000; margin: 15px 0; font-weight: bold; }
+            .slide-actions { margin-top: auto; padding-top: 20px; display: flex; flex-direction: column; gap: 8px; }
+            .mobile-nav-btn { position: absolute; bottom: 20px; width: 45px; height: 45px; background: rgba(255,255,255,0.1); border: 1px solid rgba(197,160,89,0.3); color: var(--gold); font-size: 1.5rem; border-radius: 50%; z-index: 100; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+            .mobile-nav-btn.prev { left: 20px; }
+            .mobile-nav-btn.next { right: 20px; }
+            body.on-cover .mobile-nav-btn { display: none; }
+        }
+
+        /* ── Modal & Smart Form ── */
+        .custom-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: none; z-index: 3000; justify-content: center; align-items: center; backdrop-filter: blur(8px); padding: 20px; }
+        .modal-content { background: #fff; width: 100%; max-width: 420px; padding: 40px; position: relative; text-align: center; animation: modalFade 0.4s ease; max-height: 90vh; overflow-y: auto; }
+        @keyframes modalFade { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .modal-x-close { position: absolute; top: 15px; right: 15px; background: none; border: none; font-size: 1.5rem; color: #999; cursor: pointer; }
+        .modal-content h3 { font-family: 'Cinzel', serif; font-size: 1.2rem; color: #111; margin-bottom: 10px; letter-spacing: 2px; }
+        .modal-content p { font-family: sans-serif; font-size: 0.75rem; color: #555; margin-bottom: 20px; line-height: 1.6; }
+        .modal-close { background: var(--black); color: #fff; border: none; padding: 10px 25px; font-family: sans-serif; font-size: 0.6rem; letter-spacing: 2px; text-transform: uppercase; cursor: pointer; }
+
+        .smart-form { display: flex; flex-direction: column; gap: 12px; text-align: left; }
+        .form-group { display: flex; flex-direction: column; gap: 4px; }
+        .form-group label { font-family: sans-serif; font-size: 0.6rem; color: var(--gold); text-transform: uppercase; letter-spacing: 1px; }
+        .form-group input, .form-group select { padding: 10px; border: 1px solid var(--border); background: #fff; font-family: sans-serif; font-size: 0.8rem; outline: none; }
+        .form-group input:focus { border-color: var(--gold); }
+        .phone-input-container { display: flex; gap: 5px; }
+        .phone-input-container select { flex: 0 0 90px; font-size: 0.7rem; }
+        .phone-input-container input { flex: 1; }
+        .brand-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 5px; }
+        .brand-option { display: flex; align-items: center; gap: 8px; font-size: 0.7rem; font-family: sans-serif; color: #444; cursor: pointer; }
+        .brand-option input { width: 14px; height: 14px; cursor: pointer; }
+        .form-submit { margin-top: 10px; background: var(--black); color: #fff; border: none; padding: 14px; font-family: sans-serif; font-size: 0.7rem; letter-spacing: 2px; text-transform: uppercase; cursor: pointer; transition: background 0.3s; }
+        .form-submit:hover { background: var(--gold); }
+        .optional-tag { font-size: 0.55rem; color: #999; text-transform: none; letter-spacing: 0; margin-left: 5px; }
+        #customCountryCodeRow { display: none; margin-top: 5px; }
+    </style>
+</head>
+<body>
+
+    <div id="loading-screen">
+        <div class="loading-vignette"></div>
+        <div class="loading-content">
+            <div class="loading-text">Blue Diamond Jewellery</div>
+            <div class="loading-bar-container">
+                <div class="loading-bar"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="desktop-wrapper">
+        <div id="flipbook">
+            <div class="page" data-density="hard">
+                <div class="page-content cover-page">
+                    
+    <div class="cover-page">
+        <div class="cover-vignette"></div>
+
+        <div class="cover-content">
+            <img
+                src="https://res.cloudinary.com/daucolvng/image/upload/f_auto,q_auto/BD_Logo_d4gza1"
+                alt="Blue Diamond" class="cover-logo-hero"
+            />
+
+            <div class="cov-ornament">
+                <div class="cov-orn-line"></div>
+                <div class="cov-orn-pip"></div>
+                <div class="cov-orn-line r"></div>
+            </div>
+
+            <h1 class="cov-t-blue">BLUE</h1>
+            <h1 class="cov-t-diamond">DIAMOND</h1>
+
+            <div class="cov-ornament narrow">
+                <div class="cov-orn-line"></div>
+                <div class="cov-orn-pip"></div>
+                <div class="cov-orn-line r"></div>
+            </div>
+
+            <p class="cov-jewellery">J E W E L L E R Y</p>
+        </div>
+
+        <div class="cover-invite">
+            <div class="cover-invite-line">
+                <div class="cover-invite-rule"></div>
+                <p>Swipe to explore the collection</p>
+                <div class="cover-invite-rule right"></div>
+            </div>
+            <div class="chevron-pair"><div class="cover-chevron horizontal"></div><div class="cover-chevron horizontal"></div></div>
+        </div>
+    </div>
+                </div>
+            </div>
+            
+    <div class="page" data-density="soft">
+        <div class="page-content details-side">
+            <div class="inner scrollable-content">
+                <div class="page-header-row">
+                    <span class="exquisite-label">EXQUISITE COLLECTION</span>
+                    <span class="page-counter">01 <em>/</em> 14</span>
+                </div>
+                <h2 class="product-title">undefined</h2>
+                <p class="product-ref">Model: undefined</p>
+                <div class="gold-accent-line"></div>
+                <div class="narrative-box">
+                    <label>The Piece</label>
+                    <p>undefined</p>
+                    <label>Details</label>
+                    <p>Exclusively available at Blue Diamond Jewellery.</p>
+                </div>
+                <div class="price-container">QAR undefined</div>
+                <div class="button-group">
+                    <button onclick="handleAction('Add to Bag', 'undefined', 'undefined', 'undefined')" class="btn btn-primary">Add to Bag</button>
+                    <div class="secondary-btns">
+                        <button onclick="handleAction('Advisor', 'undefined', 'undefined', 'undefined')" class="btn btn-secondary">Speak with Advisor</button>
+                        <button onclick="handleAction('Buy Now', 'undefined', 'undefined', 'undefined')" class="btn btn-secondary">Buy it Now</button>
+                    </div>
+                    <div class="view-cart-link" onclick="pf.flip(31)">View Products in Cart</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="page" data-density="soft">
+        <div class="page-content image-side" style="background-image: url('undefined')">
+            <div class="vendor-overlay-box">undefined</div>
+            <div class="center-spine-shadow"></div>
+        </div>
+    </div>
+
+    <div class="page" data-density="soft">
+        <div class="page-content details-side">
+            <div class="inner scrollable-content">
+                <div class="page-header-row">
+                    <span class="exquisite-label">EXQUISITE COLLECTION</span>
+                    <span class="page-counter">02 <em>/</em> 14</span>
+                </div>
+                <h2 class="product-title">A Matter of Light Minimal Pearl Earrings</h2>
+                <p class="product-ref">Model: ER-3681</p>
+                <div class="gold-accent-line"></div>
+                <div class="narrative-box">
+                    <label>The Piece</label>
+                    <p>Elegance suspendedâ€”crafted for those who captivate silently.</p>
+                    <label>Details</label>
+                    <p>Gold Weight: 6.6 G <br>Diamond (Carat): RD 0.83 CT, VVS-G. PRS 0.93 CT <br>Gold Color: Rose<br>Resizable: No<br>Made In: Italy<br><br>Please note that product descriptions may vary slightly depending on size and craftsmanship variations.</p>
+                </div>
+                <div class="price-container">QAR 14337</div>
+                <div class="button-group">
+                    <button onclick="handleAction('Add to Bag', 'ER-3681', 'A Matter of Light Minimal Pearl Earrings', 'Luca Carati')" class="btn btn-primary">Add to Bag</button>
+                    <div class="secondary-btns">
+                        <button onclick="handleAction('Advisor', 'ER-3681', 'A Matter of Light Minimal Pearl Earrings', 'Luca Carati')" class="btn btn-secondary">Speak with Advisor</button>
+                        <button onclick="handleAction('Buy Now', 'ER-3681', 'A Matter of Light Minimal Pearl Earrings', 'Luca Carati')" class="btn btn-secondary">Buy it Now</button>
+                    </div>
+                    <div class="view-cart-link" onclick="pf.flip(31)">View Products in Cart</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="page" data-density="soft">
+        <div class="page-content image-side" style="background-image: url('https://cdn.shopify.com/s/files/1/0707/3991/9016/files/ER-3681_a02656b6-1ada-41a3-bc99-1031c2fc84b0.jpg?v=1771778854')">
+            <div class="vendor-overlay-box">Luca Carati</div>
+            <div class="center-spine-shadow"></div>
+        </div>
+    </div>
+
+    <div class="page" data-density="soft">
+        <div class="page-content details-side">
+            <div class="inner scrollable-content">
+                <div class="page-header-row">
+                    <span class="exquisite-label">EXQUISITE COLLECTION</span>
+                    <span class="page-counter">03 <em>/</em> 14</span>
+                </div>
+                <h2 class="product-title">A Matter of Light Earrings - Malachite</h2>
+                <p class="product-ref">Model: ER-3673</p>
+                <div class="gold-accent-line"></div>
+                <div class="narrative-box">
+                    <label>The Piece</label>
+                    <p>Elegance suspendedâ€”crafted for those who captivate silently.</p>
+                    <label>Details</label>
+                    <p>Gold Weight: 6.68 G<br>Diamond (Carat): RD 0.82 CT, VVS-G. PRS 2.36 CT <br>Gold Color: Rose<br>Resizable: No<br>Made In: Italy<br><br>Please note that product descriptions may vary slightly depending on size and craftsmanship variations.</p>
+                </div>
+                <div class="price-container">QAR 14481</div>
+                <div class="button-group">
+                    <button onclick="handleAction('Add to Bag', 'ER-3673', 'A Matter of Light Earrings - Malachite', 'Luca Carati')" class="btn btn-primary">Add to Bag</button>
+                    <div class="secondary-btns">
+                        <button onclick="handleAction('Advisor', 'ER-3673', 'A Matter of Light Earrings - Malachite', 'Luca Carati')" class="btn btn-secondary">Speak with Advisor</button>
+                        <button onclick="handleAction('Buy Now', 'ER-3673', 'A Matter of Light Earrings - Malachite', 'Luca Carati')" class="btn btn-secondary">Buy it Now</button>
+                    </div>
+                    <div class="view-cart-link" onclick="pf.flip(31)">View Products in Cart</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="page" data-density="soft">
+        <div class="page-content image-side" style="background-image: url('https://cdn.shopify.com/s/files/1/0707/3991/9016/files/ER-3673_4f3f57ce-ae82-472a-9866-bbded15a7ee5.jpg?v=1771778851')">
+            <div class="vendor-overlay-box">Luca Carati</div>
+            <div class="center-spine-shadow"></div>
+        </div>
+    </div>
+
+    <div class="page" data-density="soft">
+        <div class="page-content details-side">
+            <div class="inner scrollable-content">
+                <div class="page-header-row">
+                    <span class="exquisite-label">EXQUISITE COLLECTION</span>
+                    <span class="page-counter">04 <em>/</em> 14</span>
+                </div>
+                <h2 class="product-title">Deco Pendant Necklace</h2>
+                <p class="product-ref">Model: NK-3613</p>
+                <div class="gold-accent-line"></div>
+                <div class="narrative-box">
+                    <label>The Piece</label>
+                    <p>Crafted to contour graceâ€”where geometry meets poetry.</p>
+                    <label>Details</label>
+                    <p>Gold Weight: 24.91 G<br>Diamond (Carat): RD 0.94 CT, VS-G <br>Gold Color: Rose<br>Resizable: No<br>Made In: Italy<br><br>Please note that product descriptions may vary slightly depending on size and craftsmanship variations.</p>
+                </div>
+                <div class="price-container">QAR 38340</div>
+                <div class="button-group">
+                    <button onclick="handleAction('Add to Bag', 'NK-3613', 'Deco Pendant Necklace', 'Luca Carati')" class="btn btn-primary">Add to Bag</button>
+                    <div class="secondary-btns">
+                        <button onclick="handleAction('Advisor', 'NK-3613', 'Deco Pendant Necklace', 'Luca Carati')" class="btn btn-secondary">Speak with Advisor</button>
+                        <button onclick="handleAction('Buy Now', 'NK-3613', 'Deco Pendant Necklace', 'Luca Carati')" class="btn btn-secondary">Buy it Now</button>
+                    </div>
+                    <div class="view-cart-link" onclick="pf.flip(31)">View Products in Cart</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="page" data-density="soft">
+        <div class="page-content image-side" style="background-image: url('https://cdn.shopify.com/s/files/1/0707/3991/9016/files/NK-3613_42d443c7-7c02-4fcb-afff-758a1d6cd0eb.jpg?v=1771778875')">
+            <div class="vendor-overlay-box">Luca Carati</div>
+            <div class="center-spine-shadow"></div>
+        </div>
+    </div>
+
+    <div class="page" data-density="soft">
+        <div class="page-content details-side">
+            <div class="inner scrollable-content">
+                <div class="page-header-row">
+                    <span class="exquisite-label">EXQUISITE COLLECTION</span>
+                    <span class="page-counter">05 <em>/</em> 14</span>
+                </div>
+                <h2 class="product-title">Deco Earrings</h2>
+                <p class="product-ref">Model: ER-5677</p>
+                <div class="gold-accent-line"></div>
+                <div class="narrative-box">
+                    <label>The Piece</label>
+                    <p>Elegance suspendedâ€”crafted for those who captivate silently.</p>
+                    <label>Details</label>
+                    <p>Gold Weight: 11.24 G<br>Diamond (Carat): RD 0.78 CT, VS-G<br>Gold Color: Rose<br>Resizable: No<br>Made In: Italy<br><br>Please note that product descriptions may vary slightly depending on size and craftsmanship variations.</p>
+                </div>
+                <div class="price-container">QAR 23328</div>
+                <div class="button-group">
+                    <button onclick="handleAction('Add to Bag', 'ER-5677', 'Deco Earrings', 'Luca Carati')" class="btn btn-primary">Add to Bag</button>
+                    <div class="secondary-btns">
+                        <button onclick="handleAction('Advisor', 'ER-5677', 'Deco Earrings', 'Luca Carati')" class="btn btn-secondary">Speak with Advisor</button>
+                        <button onclick="handleAction('Buy Now', 'ER-5677', 'Deco Earrings', 'Luca Carati')" class="btn btn-secondary">Buy it Now</button>
+                    </div>
+                    <div class="view-cart-link" onclick="pf.flip(31)">View Products in Cart</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="page" data-density="soft">
+        <div class="page-content image-side" style="background-image: url('https://cdn.shopify.com/s/files/1/0707/3991/9016/files/ER-5677_ffb5f009-8f29-41d3-9160-2ec3d503bc09.jpg?v=1771778857')">
+            <div class="vendor-overlay-box">Luca Carati</div>
+            <div class="center-spine-shadow"></div>
+        </div>
+    </div>
+
+    <div class="page" data-density="soft">
+        <div class="page-content details-side">
+            <div class="inner scrollable-content">
+                <div class="page-header-row">
+                    <span class="exquisite-label">EXQUISITE COLLECTION</span>
+                    <span class="page-counter">06 <em>/</em> 14</span>
+                </div>
+                <h2 class="product-title">A Matter of Light Earrings with Pearl</h2>
+                <p class="product-ref">Model: ER-3678</p>
+                <div class="gold-accent-line"></div>
+                <div class="narrative-box">
+                    <label>The Piece</label>
+                    <p>Elegance suspendedâ€”crafted for those who captivate silently.</p>
+                    <label>Details</label>
+                    <p>Gold Weight: 8.42 G <br>Diamond (Carat): RD 1.16 CT, VVS-G. PRS 0.95 CT <br>Gold Color: Rose<br>Resizable: No<br>Made In: Italy<br><br>Please note that product descriptions may vary slightly depending on size and craftsmanship variations.</p>
+                </div>
+                <div class="price-container">QAR 28233</div>
+                <div class="button-group">
+                    <button onclick="handleAction('Add to Bag', 'ER-3678', 'A Matter of Light Earrings with Pearl', 'Luca Carati')" class="btn btn-primary">Add to Bag</button>
+                    <div class="secondary-btns">
+                        <button onclick="handleAction('Advisor', 'ER-3678', 'A Matter of Light Earrings with Pearl', 'Luca Carati')" class="btn btn-secondary">Speak with Advisor</button>
+                        <button onclick="handleAction('Buy Now', 'ER-3678', 'A Matter of Light Earrings with Pearl', 'Luca Carati')" class="btn btn-secondary">Buy it Now</button>
+                    </div>
+                    <div class="view-cart-link" onclick="pf.flip(31)">View Products in Cart</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="page" data-density="soft">
+        <div class="page-content image-side" style="background-image: url('https://cdn.shopify.com/s/files/1/0707/3991/9016/files/ER-3678_756b876d-c6a6-4fc9-bc5c-b6743a1bf3ea.jpg?v=1771778853')">
+            <div class="vendor-overlay-box">Luca Carati</div>
+            <div class="center-spine-shadow"></div>
+        </div>
+    </div>
+
+    <div class="page" data-density="soft">
+        <div class="page-content details-side">
+            <div class="inner scrollable-content">
+                <div class="page-header-row">
+                    <span class="exquisite-label">EXQUISITE COLLECTION</span>
+                    <span class="page-counter">07 <em>/</em> 14</span>
+                </div>
+                <h2 class="product-title">A Matter of Light Necklace with Pearl -Small</h2>
+                <p class="product-ref">Model: NK-2509</p>
+                <div class="gold-accent-line"></div>
+                <div class="narrative-box">
+                    <label>The Piece</label>
+                    <p>Crafted to contour graceâ€”where geometry meets poetry.</p>
+                    <label>Details</label>
+                    <p>Gold Weight: 7.41 G <br>Diamond (Carat): RD 0.58 CT, VVS-G. PRS 0.47 CT <br>Gold Color: Rose<br>Resizable: No<br>Made In: Italy<br><br>Please note that product descriptions may vary slightly depending on size and craftsmanship variations.</p>
+                </div>
+                <div class="price-container">QAR 14931</div>
+                <div class="button-group">
+                    <button onclick="handleAction('Add to Bag', 'NK-2509', 'A Matter of Light Necklace with Pearl -Small', 'Luca Carati')" class="btn btn-primary">Add to Bag</button>
+                    <div class="secondary-btns">
+                        <button onclick="handleAction('Advisor', 'NK-2509', 'A Matter of Light Necklace with Pearl -Small', 'Luca Carati')" class="btn btn-secondary">Speak with Advisor</button>
+                        <button onclick="handleAction('Buy Now', 'NK-2509', 'A Matter of Light Necklace with Pearl -Small', 'Luca Carati')" class="btn btn-secondary">Buy it Now</button>
+                    </div>
+                    <div class="view-cart-link" onclick="pf.flip(31)">View Products in Cart</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="page" data-density="soft">
+        <div class="page-content image-side" style="background-image: url('https://cdn.shopify.com/s/files/1/0707/3991/9016/files/NK-2509_068b2b05-b3e8-4754-ae67-59863f1bde8e.jpg?v=1771778837')">
+            <div class="vendor-overlay-box">Luca Carati</div>
+            <div class="center-spine-shadow"></div>
+        </div>
+    </div>
+
+    <div class="page" data-density="soft">
+        <div class="page-content details-side">
+            <div class="inner scrollable-content">
+                <div class="page-header-row">
+                    <span class="exquisite-label">EXQUISITE COLLECTION</span>
+                    <span class="page-counter">08 <em>/</em> 14</span>
+                </div>
+                <h2 class="product-title">Natura Trefoil Stud Earrings - Malachite</h2>
+                <p class="product-ref">Model: ER-2914</p>
+                <div class="gold-accent-line"></div>
+                <div class="narrative-box">
+                    <label>The Piece</label>
+                    <p>Choreographed brilliance for your daily ballet of style.</p>
+                    <label>Details</label>
+                    <p>Gold Weight: 7.55 G<br>Diamond (Carat): RD 1.27 CT, VVS-G. MC 1.10 G <br>Gold Color: Rose<br>Resizable: No<br>Made In: Italy<br><br>Please note that product descriptions may vary slightly depending on size and craftsmanship variations.</p>
+                </div>
+                <div class="price-container">QAR 18864</div>
+                <div class="button-group">
+                    <button onclick="handleAction('Add to Bag', 'ER-2914', 'Natura Trefoil Stud Earrings - Malachite', 'Luca Carati')" class="btn btn-primary">Add to Bag</button>
+                    <div class="secondary-btns">
+                        <button onclick="handleAction('Advisor', 'ER-2914', 'Natura Trefoil Stud Earrings - Malachite', 'Luca Carati')" class="btn btn-secondary">Speak with Advisor</button>
+                        <button onclick="handleAction('Buy Now', 'ER-2914', 'Natura Trefoil Stud Earrings - Malachite', 'Luca Carati')" class="btn btn-secondary">Buy it Now</button>
+                    </div>
+                    <div class="view-cart-link" onclick="pf.flip(31)">View Products in Cart</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="page" data-density="soft">
+        <div class="page-content image-side" style="background-image: url('https://cdn.shopify.com/s/files/1/0707/3991/9016/files/ER-2914_a1b87618-cf90-4e93-8164-024ee7798806.jpg?v=1754897205')">
+            <div class="vendor-overlay-box">Luca Carati</div>
+            <div class="center-spine-shadow"></div>
+        </div>
+    </div>
+
+    <div class="page" data-density="soft">
+        <div class="page-content details-side">
+            <div class="inner scrollable-content">
+                <div class="page-header-row">
+                    <span class="exquisite-label">EXQUISITE COLLECTION</span>
+                    <span class="page-counter">09 <em>/</em> 14</span>
+                </div>
+                <h2 class="product-title">A Matter Of Light White Gold Ring</h2>
+                <p class="product-ref">Model: RN-3379</p>
+                <div class="gold-accent-line"></div>
+                <div class="narrative-box">
+                    <label>The Piece</label>
+                    <p>A statement forged in fire and finesse.</p>
+                    <label>Details</label>
+                    <p>Gold Weight: 10.30 G<br>Diamond (Carat): RD 1.48 CT, VVS-G. <br>Gold Color: Rose<br>Resizable: No<br>Made In: Italy<br><br>Please note that product descriptions may vary slightly depending on size and craftsmanship variations.</p>
+                </div>
+                <div class="price-container">QAR 18045</div>
+                <div class="button-group">
+                    <button onclick="handleAction('Add to Bag', 'RN-3379', 'A Matter Of Light White Gold Ring', 'Luca Carati')" class="btn btn-primary">Add to Bag</button>
+                    <div class="secondary-btns">
+                        <button onclick="handleAction('Advisor', 'RN-3379', 'A Matter Of Light White Gold Ring', 'Luca Carati')" class="btn btn-secondary">Speak with Advisor</button>
+                        <button onclick="handleAction('Buy Now', 'RN-3379', 'A Matter Of Light White Gold Ring', 'Luca Carati')" class="btn btn-secondary">Buy it Now</button>
+                    </div>
+                    <div class="view-cart-link" onclick="pf.flip(31)">View Products in Cart</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="page" data-density="soft">
+        <div class="page-content image-side" style="background-image: url('https://cdn.shopify.com/s/files/1/0707/3991/9016/files/RN-3379_13a04a4d-ba79-4246-b851-d85f914afbf1.jpg?v=1754718861')">
+            <div class="vendor-overlay-box">Luca Carati</div>
+            <div class="center-spine-shadow"></div>
+        </div>
+    </div>
+
+    <div class="page" data-density="soft">
+        <div class="page-content details-side">
+            <div class="inner scrollable-content">
+                <div class="page-header-row">
+                    <span class="exquisite-label">EXQUISITE COLLECTION</span>
+                    <span class="page-counter">10 <em>/</em> 14</span>
+                </div>
+                <h2 class="product-title">Art Deco Rose Gold Ring</h2>
+                <p class="product-ref">Model: RN-3393</p>
+                <div class="gold-accent-line"></div>
+                <div class="narrative-box">
+                    <label>The Piece</label>
+                    <p>A tactile signature of personal grandeur.</p>
+                    <label>Details</label>
+                    <p>Gold Weight: 2.65 G<br>Diamond (Carat): RD 1.74 CT, VVS-G. <br>Gold Color: Rose<br>Resizable: No<br>Made In: Italy<br><br>Please note that product descriptions may vary slightly depending on size and craftsmanship variations.</p>
+                </div>
+                <div class="price-container">QAR 20853</div>
+                <div class="button-group">
+                    <button onclick="handleAction('Add to Bag', 'RN-3393', 'Art Deco Rose Gold Ring', 'Luca Carati')" class="btn btn-primary">Add to Bag</button>
+                    <div class="secondary-btns">
+                        <button onclick="handleAction('Advisor', 'RN-3393', 'Art Deco Rose Gold Ring', 'Luca Carati')" class="btn btn-secondary">Speak with Advisor</button>
+                        <button onclick="handleAction('Buy Now', 'RN-3393', 'Art Deco Rose Gold Ring', 'Luca Carati')" class="btn btn-secondary">Buy it Now</button>
+                    </div>
+                    <div class="view-cart-link" onclick="pf.flip(31)">View Products in Cart</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="page" data-density="soft">
+        <div class="page-content image-side" style="background-image: url('https://cdn.shopify.com/s/files/1/0707/3991/9016/files/RN-3393_06d9d07c-f336-46ad-9741-7c87e3156167.png?v=1754718873')">
+            <div class="vendor-overlay-box">Luca Carati</div>
+            <div class="center-spine-shadow"></div>
+        </div>
+    </div>
+
+    <div class="page" data-density="soft">
+        <div class="page-content details-side">
+            <div class="inner scrollable-content">
+                <div class="page-header-row">
+                    <span class="exquisite-label">EXQUISITE COLLECTION</span>
+                    <span class="page-counter">11 <em>/</em> 14</span>
+                </div>
+                <h2 class="product-title">A Matter Of Light Earrings</h2>
+                <p class="product-ref">Model: ER-2897</p>
+                <div class="gold-accent-line"></div>
+                <div class="narrative-box">
+                    <label>The Piece</label>
+                    <p>Sculpted arcs of allure, anchored in precious detail.</p>
+                    <label>Details</label>
+                    <p>Gold Weight: 6.03 G<br>Diamond (Carat): RD 0.85 CT, VVS-G <br>Gold Color: White<br>Resizable: No<br>Made In: Italy<br><br>Please note that product descriptions may vary slightly depending on size and craftsmanship variations.</p>
+                </div>
+                <div class="price-container">QAR 12537</div>
+                <div class="button-group">
+                    <button onclick="handleAction('Add to Bag', 'ER-2897', 'A Matter Of Light Earrings', 'Luca Carati')" class="btn btn-primary">Add to Bag</button>
+                    <div class="secondary-btns">
+                        <button onclick="handleAction('Advisor', 'ER-2897', 'A Matter Of Light Earrings', 'Luca Carati')" class="btn btn-secondary">Speak with Advisor</button>
+                        <button onclick="handleAction('Buy Now', 'ER-2897', 'A Matter Of Light Earrings', 'Luca Carati')" class="btn btn-secondary">Buy it Now</button>
+                    </div>
+                    <div class="view-cart-link" onclick="pf.flip(31)">View Products in Cart</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="page" data-density="soft">
+        <div class="page-content image-side" style="background-image: url('https://cdn.shopify.com/s/files/1/0707/3991/9016/files/ER-2897_68d6f7f9-257d-4ea7-8444-013e435df720.jpg?v=1754718853')">
+            <div class="vendor-overlay-box">Luca Carati</div>
+            <div class="center-spine-shadow"></div>
+        </div>
+    </div>
+
+    <div class="page" data-density="soft">
+        <div class="page-content details-side">
+            <div class="inner scrollable-content">
+                <div class="page-header-row">
+                    <span class="exquisite-label">EXQUISITE COLLECTION</span>
+                    <span class="page-counter">12 <em>/</em> 14</span>
+                </div>
+                <h2 class="product-title">Natura Necklace- Malachite & Diamonds</h2>
+                <p class="product-ref">Model: NK-2063</p>
+                <div class="gold-accent-line"></div>
+                <div class="narrative-box">
+                    <label>The Piece</label>
+                    <p>A singular expression of artistry and flair.</p>
+                    <label>Details</label>
+                    <p>Gold Weight: 6.06 G <br>Diamond (Carat): RD 0.71 CT, VVS-G. MC 1.10 G<br>Gold Color: Rose<br>Resizable: No<br>Made In: Italy<br><br>Please note that product descriptions may vary slightly depending on size and craftsmanship variations.</p>
+                </div>
+                <div class="price-container">QAR 12348</div>
+                <div class="button-group">
+                    <button onclick="handleAction('Add to Bag', 'NK-2063', 'Natura Necklace- Malachite & Diamonds', 'Luca Carati')" class="btn btn-primary">Add to Bag</button>
+                    <div class="secondary-btns">
+                        <button onclick="handleAction('Advisor', 'NK-2063', 'Natura Necklace- Malachite & Diamonds', 'Luca Carati')" class="btn btn-secondary">Speak with Advisor</button>
+                        <button onclick="handleAction('Buy Now', 'NK-2063', 'Natura Necklace- Malachite & Diamonds', 'Luca Carati')" class="btn btn-secondary">Buy it Now</button>
+                    </div>
+                    <div class="view-cart-link" onclick="pf.flip(31)">View Products in Cart</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="page" data-density="soft">
+        <div class="page-content image-side" style="background-image: url('https://cdn.shopify.com/s/files/1/0707/3991/9016/files/NK-2063_cd5a7591-0624-4cf7-bbc9-4280f6e5c741.jpg?v=1754718841')">
+            <div class="vendor-overlay-box">Luca Carati</div>
+            <div class="center-spine-shadow"></div>
+        </div>
+    </div>
+
+    <div class="page" data-density="soft">
+        <div class="page-content details-side">
+            <div class="inner scrollable-content">
+                <div class="page-header-row">
+                    <span class="exquisite-label">EXQUISITE COLLECTION</span>
+                    <span class="page-counter">13 <em>/</em> 14</span>
+                </div>
+                <h2 class="product-title">Art Deco Round Necklace</h2>
+                <p class="product-ref">Model: NK-2056</p>
+                <div class="gold-accent-line"></div>
+                <div class="narrative-box">
+                    <label>The Piece</label>
+                    <p>A cascade of polished elegance draped in timeless charm.</p>
+                    <label>Details</label>
+                    <p>Gold Weight: 8.94 G<br>Diamond (Carat): RD 1.32 CT, VVS-G <br>Gold Color: Rose<br>Resizable: No<br>Made In: Italy<br><br>Please note that product descriptions may vary slightly depending on size and craftsmanship variations.</p>
+                </div>
+                <div class="price-container">QAR 20061</div>
+                <div class="button-group">
+                    <button onclick="handleAction('Add to Bag', 'NK-2056', 'Art Deco Round Necklace', 'Luca Carati')" class="btn btn-primary">Add to Bag</button>
+                    <div class="secondary-btns">
+                        <button onclick="handleAction('Advisor', 'NK-2056', 'Art Deco Round Necklace', 'Luca Carati')" class="btn btn-secondary">Speak with Advisor</button>
+                        <button onclick="handleAction('Buy Now', 'NK-2056', 'Art Deco Round Necklace', 'Luca Carati')" class="btn btn-secondary">Buy it Now</button>
+                    </div>
+                    <div class="view-cart-link" onclick="pf.flip(31)">View Products in Cart</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="page" data-density="soft">
+        <div class="page-content image-side" style="background-image: url('https://cdn.shopify.com/s/files/1/0707/3991/9016/files/NK-2056_c6804d71-68d2-40be-b926-a39d7b1b8626.jpg?v=1754718838')">
+            <div class="vendor-overlay-box">Luca Carati</div>
+            <div class="center-spine-shadow"></div>
+        </div>
+    </div>
+
+    <div class="page" data-density="soft">
+        <div class="page-content details-side">
+            <div class="inner scrollable-content">
+                <div class="page-header-row">
+                    <span class="exquisite-label">EXQUISITE COLLECTION</span>
+                    <span class="page-counter">14 <em>/</em> 14</span>
+                </div>
+                <h2 class="product-title">Art Deco Geometric Pendant Necklace</h2>
+                <p class="product-ref">Model: NK-2580</p>
+                <div class="gold-accent-line"></div>
+                <div class="narrative-box">
+                    <label>The Piece</label>
+                    <p>Echoes of Italian artistry in every deliberate curve.</p>
+                    <label>Details</label>
+                    <p>Gold Weight: 8.04 G<br>Diamond (Carat): RD 1.31CT, VVS-G <br>Gold Color: Yellow<br>Resizable: No<br>Made In: Italy<br><br>Please note that product descriptions may vary slightly depending on size and craftsmanship variations.</p>
+                </div>
+                <div class="price-container">QAR 19548</div>
+                <div class="button-group">
+                    <button onclick="handleAction('Add to Bag', 'NK-2580', 'Art Deco Geometric Pendant Necklace', 'Luca Carati')" class="btn btn-primary">Add to Bag</button>
+                    <div class="secondary-btns">
+                        <button onclick="handleAction('Advisor', 'NK-2580', 'Art Deco Geometric Pendant Necklace', 'Luca Carati')" class="btn btn-secondary">Speak with Advisor</button>
+                        <button onclick="handleAction('Buy Now', 'NK-2580', 'Art Deco Geometric Pendant Necklace', 'Luca Carati')" class="btn btn-secondary">Buy it Now</button>
+                    </div>
+                    <div class="view-cart-link" onclick="pf.flip(31)">View Products in Cart</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="page" data-density="soft">
+        <div class="page-content image-side" style="background-image: url('https://cdn.shopify.com/s/files/1/0707/3991/9016/files/NK-2580_ed9f722c-4214-4f4e-93ea-27146ac45bce.jpg?v=1754718833')">
+            <div class="vendor-overlay-box">Luca Carati</div>
+            <div class="center-spine-shadow"></div>
+        </div>
+    </div>
+
+    <div class="page" data-density="hard">
+        <div class="page-content cart-page">
+            <div class="inner scrollable-content">
+                <div class="chapter-label">YOUR SELECTION</div>
+                <h2 class="chapter-title">MY CART</h2>
+                <div class="gold-accent-line centered"></div>
+                <div id="cart-container-desktop" class="cart-items-container">
+                    <!-- Dynamic Cart Items -->
+                </div>
+                <button onclick="pf.flip(1)" class="btn btn-secondary" style="margin-top:20px;">Continue Exploring</button>
+            </div>
+        </div>
+    </div>
+    <div class="page" data-density="hard">
+        <div class="page-content end-page">
+            <div class="end-inner">
+                <img src="https://res.cloudinary.com/daucolvng/image/upload/f_auto,q_auto/BD_Logo_d4gza1" class="end-logo" alt="BD Logo">
+                <h2 class="chapter-title">THE END</h2>
+                <div class="gold-accent-line centered"></div>
+                <p class="end-message">Thank you for exploring our collections. We invite you to connect with our advisors for a personalized experience.</p>
+                <button onclick="pf.flip(1)" class="btn btn-primary" style="margin-top:30px; width:auto; padding: 15px 40px;">Return to Main</button>
+            </div>
+        </div>
+    </div>
+    <div class="page" data-density="hard">
+        <div class="page-content cover-page">
+            <div class="cover-vignette"></div>
+            <div class="cover-content"></div>
+        </div>
+    </div>
+
+        </div>
+    </div>
+
+    <div class="mobile-wrapper">
+        <div id="mobile-flipbook">
+            <div class="page" data-density="hard">
+                <div class="cover-page" id="mobile-cover">
+                    
+    <div class="cover-page">
+        <div class="cover-vignette"></div>
+
+        <div class="cover-content">
+            <img
+                src="https://res.cloudinary.com/daucolvng/image/upload/f_auto,q_auto/BD_Logo_d4gza1"
+                alt="Blue Diamond" class="cover-logo-hero"
+            />
+
+            <div class="cov-ornament">
+                <div class="cov-orn-line"></div>
+                <div class="cov-orn-pip"></div>
+                <div class="cov-orn-line r"></div>
+            </div>
+
+            <h1 class="cov-t-blue">BLUE</h1>
+            <h1 class="cov-t-diamond">DIAMOND</h1>
+
+            <div class="cov-ornament narrow">
+                <div class="cov-orn-line"></div>
+                <div class="cov-orn-pip"></div>
+                <div class="cov-orn-line r"></div>
+            </div>
+
+            <p class="cov-jewellery">J E W E L L E R Y</p>
+        </div>
+
+        <div class="cover-invite">
+            <div class="cover-invite-line">
+                <div class="cover-invite-rule"></div>
+                <p>Flip the page to discover the collection</p>
+                <div class="cover-invite-rule right"></div>
+            </div>
+            <div class="chevron-pair"><div class="cover-chevron horizontal"></div><div class="cover-chevron horizontal"></div></div>
+        </div>
+    </div>
+                </div>
+            </div>
+            
+    <div class="page mobile-single-page" data-density="soft">
+        <div class="mobile-page-wrap">
+            <div class="mobile-img-panel" style="background-image: url('undefined')">
+                <div class="vendor-tag">undefined</div>
+                <div class="mobile-pnum">
+                    01<span> / 14</span>
+                </div>
+            </div>
+            <div class="mobile-info-panel">
+                <span class="exquisite-label">Exquisite Collection</span>
+                <h2 class="product-title">undefined</h2>
+                <p class="product-ref">REF: undefined</p>
+                <div class="gold-accent-line"></div>
+                <div class="price-display">QAR undefined</div>
+                <details class="accordion">
+                    <summary>The Piece</summary>
+                    <p>undefined</p>
+                </details>
+                <details class="accordion">
+                    <summary>Details</summary>
+                    <p>Exclusively available at Blue Diamond Jewellery.</p>
+                </details>
+                <div class="slide-actions">
+                    <button onclick="handleAction('Add to Bag', 'undefined', 'undefined', 'undefined')" class="btn btn-primary">Add to Bag</button>
+                    <button onclick="handleAction('Advisor', 'undefined', 'undefined', 'undefined')" class="btn btn-secondary-mobile">Speak with Advisor</button>
+                    <button onclick="handleAction('Buy Now', 'undefined', 'undefined', 'undefined')" class="btn btn-secondary-mobile">Buy it Now</button>
+                    <div class="view-cart-link" onclick="pfMobile.flip(15)">View Products in Cart</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="page mobile-single-page" data-density="soft">
+        <div class="mobile-page-wrap">
+            <div class="mobile-img-panel" style="background-image: url('https://cdn.shopify.com/s/files/1/0707/3991/9016/files/ER-3681_a02656b6-1ada-41a3-bc99-1031c2fc84b0.jpg?v=1771778854')">
+                <div class="vendor-tag">Luca Carati</div>
+                <div class="mobile-pnum">
+                    02<span> / 14</span>
+                </div>
+            </div>
+            <div class="mobile-info-panel">
+                <span class="exquisite-label">Exquisite Collection</span>
+                <h2 class="product-title">A Matter of Light Minimal Pearl Earrings</h2>
+                <p class="product-ref">REF: ER-3681</p>
+                <div class="gold-accent-line"></div>
+                <div class="price-display">QAR 14337</div>
+                <details class="accordion">
+                    <summary>The Piece</summary>
+                    <p>Elegance suspendedâ€”crafted for those who captivate silently.</p>
+                </details>
+                <details class="accordion">
+                    <summary>Details</summary>
+                    <p>Gold Weight: 6.6 G <br>Diamond (Carat): RD 0.83 CT, VVS-G. PRS 0.93 CT <br>Gold Color: Rose<br>Resizable: No<br>Made In: Italy<br><br>Please note that product descriptions may vary slightly depending on size and craftsmanship variations.</p>
+                </details>
+                <div class="slide-actions">
+                    <button onclick="handleAction('Add to Bag', 'ER-3681', 'A Matter of Light Minimal Pearl Earrings', 'Luca Carati')" class="btn btn-primary">Add to Bag</button>
+                    <button onclick="handleAction('Advisor', 'ER-3681', 'A Matter of Light Minimal Pearl Earrings', 'Luca Carati')" class="btn btn-secondary-mobile">Speak with Advisor</button>
+                    <button onclick="handleAction('Buy Now', 'ER-3681', 'A Matter of Light Minimal Pearl Earrings', 'Luca Carati')" class="btn btn-secondary-mobile">Buy it Now</button>
+                    <div class="view-cart-link" onclick="pfMobile.flip(15)">View Products in Cart</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="page mobile-single-page" data-density="soft">
+        <div class="mobile-page-wrap">
+            <div class="mobile-img-panel" style="background-image: url('https://cdn.shopify.com/s/files/1/0707/3991/9016/files/ER-3673_4f3f57ce-ae82-472a-9866-bbded15a7ee5.jpg?v=1771778851')">
+                <div class="vendor-tag">Luca Carati</div>
+                <div class="mobile-pnum">
+                    03<span> / 14</span>
+                </div>
+            </div>
+            <div class="mobile-info-panel">
+                <span class="exquisite-label">Exquisite Collection</span>
+                <h2 class="product-title">A Matter of Light Earrings - Malachite</h2>
+                <p class="product-ref">REF: ER-3673</p>
+                <div class="gold-accent-line"></div>
+                <div class="price-display">QAR 14481</div>
+                <details class="accordion">
+                    <summary>The Piece</summary>
+                    <p>Elegance suspendedâ€”crafted for those who captivate silently.</p>
+                </details>
+                <details class="accordion">
+                    <summary>Details</summary>
+                    <p>Gold Weight: 6.68 G<br>Diamond (Carat): RD 0.82 CT, VVS-G. PRS 2.36 CT <br>Gold Color: Rose<br>Resizable: No<br>Made In: Italy<br><br>Please note that product descriptions may vary slightly depending on size and craftsmanship variations.</p>
+                </details>
+                <div class="slide-actions">
+                    <button onclick="handleAction('Add to Bag', 'ER-3673', 'A Matter of Light Earrings - Malachite', 'Luca Carati')" class="btn btn-primary">Add to Bag</button>
+                    <button onclick="handleAction('Advisor', 'ER-3673', 'A Matter of Light Earrings - Malachite', 'Luca Carati')" class="btn btn-secondary-mobile">Speak with Advisor</button>
+                    <button onclick="handleAction('Buy Now', 'ER-3673', 'A Matter of Light Earrings - Malachite', 'Luca Carati')" class="btn btn-secondary-mobile">Buy it Now</button>
+                    <div class="view-cart-link" onclick="pfMobile.flip(15)">View Products in Cart</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="page mobile-single-page" data-density="soft">
+        <div class="mobile-page-wrap">
+            <div class="mobile-img-panel" style="background-image: url('https://cdn.shopify.com/s/files/1/0707/3991/9016/files/NK-3613_42d443c7-7c02-4fcb-afff-758a1d6cd0eb.jpg?v=1771778875')">
+                <div class="vendor-tag">Luca Carati</div>
+                <div class="mobile-pnum">
+                    04<span> / 14</span>
+                </div>
+            </div>
+            <div class="mobile-info-panel">
+                <span class="exquisite-label">Exquisite Collection</span>
+                <h2 class="product-title">Deco Pendant Necklace</h2>
+                <p class="product-ref">REF: NK-3613</p>
+                <div class="gold-accent-line"></div>
+                <div class="price-display">QAR 38340</div>
+                <details class="accordion">
+                    <summary>The Piece</summary>
+                    <p>Crafted to contour graceâ€”where geometry meets poetry.</p>
+                </details>
+                <details class="accordion">
+                    <summary>Details</summary>
+                    <p>Gold Weight: 24.91 G<br>Diamond (Carat): RD 0.94 CT, VS-G <br>Gold Color: Rose<br>Resizable: No<br>Made In: Italy<br><br>Please note that product descriptions may vary slightly depending on size and craftsmanship variations.</p>
+                </details>
+                <div class="slide-actions">
+                    <button onclick="handleAction('Add to Bag', 'NK-3613', 'Deco Pendant Necklace', 'Luca Carati')" class="btn btn-primary">Add to Bag</button>
+                    <button onclick="handleAction('Advisor', 'NK-3613', 'Deco Pendant Necklace', 'Luca Carati')" class="btn btn-secondary-mobile">Speak with Advisor</button>
+                    <button onclick="handleAction('Buy Now', 'NK-3613', 'Deco Pendant Necklace', 'Luca Carati')" class="btn btn-secondary-mobile">Buy it Now</button>
+                    <div class="view-cart-link" onclick="pfMobile.flip(15)">View Products in Cart</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="page mobile-single-page" data-density="soft">
+        <div class="mobile-page-wrap">
+            <div class="mobile-img-panel" style="background-image: url('https://cdn.shopify.com/s/files/1/0707/3991/9016/files/ER-5677_ffb5f009-8f29-41d3-9160-2ec3d503bc09.jpg?v=1771778857')">
+                <div class="vendor-tag">Luca Carati</div>
+                <div class="mobile-pnum">
+                    05<span> / 14</span>
+                </div>
+            </div>
+            <div class="mobile-info-panel">
+                <span class="exquisite-label">Exquisite Collection</span>
+                <h2 class="product-title">Deco Earrings</h2>
+                <p class="product-ref">REF: ER-5677</p>
+                <div class="gold-accent-line"></div>
+                <div class="price-display">QAR 23328</div>
+                <details class="accordion">
+                    <summary>The Piece</summary>
+                    <p>Elegance suspendedâ€”crafted for those who captivate silently.</p>
+                </details>
+                <details class="accordion">
+                    <summary>Details</summary>
+                    <p>Gold Weight: 11.24 G<br>Diamond (Carat): RD 0.78 CT, VS-G<br>Gold Color: Rose<br>Resizable: No<br>Made In: Italy<br><br>Please note that product descriptions may vary slightly depending on size and craftsmanship variations.</p>
+                </details>
+                <div class="slide-actions">
+                    <button onclick="handleAction('Add to Bag', 'ER-5677', 'Deco Earrings', 'Luca Carati')" class="btn btn-primary">Add to Bag</button>
+                    <button onclick="handleAction('Advisor', 'ER-5677', 'Deco Earrings', 'Luca Carati')" class="btn btn-secondary-mobile">Speak with Advisor</button>
+                    <button onclick="handleAction('Buy Now', 'ER-5677', 'Deco Earrings', 'Luca Carati')" class="btn btn-secondary-mobile">Buy it Now</button>
+                    <div class="view-cart-link" onclick="pfMobile.flip(15)">View Products in Cart</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="page mobile-single-page" data-density="soft">
+        <div class="mobile-page-wrap">
+            <div class="mobile-img-panel" style="background-image: url('https://cdn.shopify.com/s/files/1/0707/3991/9016/files/ER-3678_756b876d-c6a6-4fc9-bc5c-b6743a1bf3ea.jpg?v=1771778853')">
+                <div class="vendor-tag">Luca Carati</div>
+                <div class="mobile-pnum">
+                    06<span> / 14</span>
+                </div>
+            </div>
+            <div class="mobile-info-panel">
+                <span class="exquisite-label">Exquisite Collection</span>
+                <h2 class="product-title">A Matter of Light Earrings with Pearl</h2>
+                <p class="product-ref">REF: ER-3678</p>
+                <div class="gold-accent-line"></div>
+                <div class="price-display">QAR 28233</div>
+                <details class="accordion">
+                    <summary>The Piece</summary>
+                    <p>Elegance suspendedâ€”crafted for those who captivate silently.</p>
+                </details>
+                <details class="accordion">
+                    <summary>Details</summary>
+                    <p>Gold Weight: 8.42 G <br>Diamond (Carat): RD 1.16 CT, VVS-G. PRS 0.95 CT <br>Gold Color: Rose<br>Resizable: No<br>Made In: Italy<br><br>Please note that product descriptions may vary slightly depending on size and craftsmanship variations.</p>
+                </details>
+                <div class="slide-actions">
+                    <button onclick="handleAction('Add to Bag', 'ER-3678', 'A Matter of Light Earrings with Pearl', 'Luca Carati')" class="btn btn-primary">Add to Bag</button>
+                    <button onclick="handleAction('Advisor', 'ER-3678', 'A Matter of Light Earrings with Pearl', 'Luca Carati')" class="btn btn-secondary-mobile">Speak with Advisor</button>
+                    <button onclick="handleAction('Buy Now', 'ER-3678', 'A Matter of Light Earrings with Pearl', 'Luca Carati')" class="btn btn-secondary-mobile">Buy it Now</button>
+                    <div class="view-cart-link" onclick="pfMobile.flip(15)">View Products in Cart</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="page mobile-single-page" data-density="soft">
+        <div class="mobile-page-wrap">
+            <div class="mobile-img-panel" style="background-image: url('https://cdn.shopify.com/s/files/1/0707/3991/9016/files/NK-2509_068b2b05-b3e8-4754-ae67-59863f1bde8e.jpg?v=1771778837')">
+                <div class="vendor-tag">Luca Carati</div>
+                <div class="mobile-pnum">
+                    07<span> / 14</span>
+                </div>
+            </div>
+            <div class="mobile-info-panel">
+                <span class="exquisite-label">Exquisite Collection</span>
+                <h2 class="product-title">A Matter of Light Necklace with Pearl -Small</h2>
+                <p class="product-ref">REF: NK-2509</p>
+                <div class="gold-accent-line"></div>
+                <div class="price-display">QAR 14931</div>
+                <details class="accordion">
+                    <summary>The Piece</summary>
+                    <p>Crafted to contour graceâ€”where geometry meets poetry.</p>
+                </details>
+                <details class="accordion">
+                    <summary>Details</summary>
+                    <p>Gold Weight: 7.41 G <br>Diamond (Carat): RD 0.58 CT, VVS-G. PRS 0.47 CT <br>Gold Color: Rose<br>Resizable: No<br>Made In: Italy<br><br>Please note that product descriptions may vary slightly depending on size and craftsmanship variations.</p>
+                </details>
+                <div class="slide-actions">
+                    <button onclick="handleAction('Add to Bag', 'NK-2509', 'A Matter of Light Necklace with Pearl -Small', 'Luca Carati')" class="btn btn-primary">Add to Bag</button>
+                    <button onclick="handleAction('Advisor', 'NK-2509', 'A Matter of Light Necklace with Pearl -Small', 'Luca Carati')" class="btn btn-secondary-mobile">Speak with Advisor</button>
+                    <button onclick="handleAction('Buy Now', 'NK-2509', 'A Matter of Light Necklace with Pearl -Small', 'Luca Carati')" class="btn btn-secondary-mobile">Buy it Now</button>
+                    <div class="view-cart-link" onclick="pfMobile.flip(15)">View Products in Cart</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="page mobile-single-page" data-density="soft">
+        <div class="mobile-page-wrap">
+            <div class="mobile-img-panel" style="background-image: url('https://cdn.shopify.com/s/files/1/0707/3991/9016/files/ER-2914_a1b87618-cf90-4e93-8164-024ee7798806.jpg?v=1754897205')">
+                <div class="vendor-tag">Luca Carati</div>
+                <div class="mobile-pnum">
+                    08<span> / 14</span>
+                </div>
+            </div>
+            <div class="mobile-info-panel">
+                <span class="exquisite-label">Exquisite Collection</span>
+                <h2 class="product-title">Natura Trefoil Stud Earrings - Malachite</h2>
+                <p class="product-ref">REF: ER-2914</p>
+                <div class="gold-accent-line"></div>
+                <div class="price-display">QAR 18864</div>
+                <details class="accordion">
+                    <summary>The Piece</summary>
+                    <p>Choreographed brilliance for your daily ballet of style.</p>
+                </details>
+                <details class="accordion">
+                    <summary>Details</summary>
+                    <p>Gold Weight: 7.55 G<br>Diamond (Carat): RD 1.27 CT, VVS-G. MC 1.10 G <br>Gold Color: Rose<br>Resizable: No<br>Made In: Italy<br><br>Please note that product descriptions may vary slightly depending on size and craftsmanship variations.</p>
+                </details>
+                <div class="slide-actions">
+                    <button onclick="handleAction('Add to Bag', 'ER-2914', 'Natura Trefoil Stud Earrings - Malachite', 'Luca Carati')" class="btn btn-primary">Add to Bag</button>
+                    <button onclick="handleAction('Advisor', 'ER-2914', 'Natura Trefoil Stud Earrings - Malachite', 'Luca Carati')" class="btn btn-secondary-mobile">Speak with Advisor</button>
+                    <button onclick="handleAction('Buy Now', 'ER-2914', 'Natura Trefoil Stud Earrings - Malachite', 'Luca Carati')" class="btn btn-secondary-mobile">Buy it Now</button>
+                    <div class="view-cart-link" onclick="pfMobile.flip(15)">View Products in Cart</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="page mobile-single-page" data-density="soft">
+        <div class="mobile-page-wrap">
+            <div class="mobile-img-panel" style="background-image: url('https://cdn.shopify.com/s/files/1/0707/3991/9016/files/RN-3379_13a04a4d-ba79-4246-b851-d85f914afbf1.jpg?v=1754718861')">
+                <div class="vendor-tag">Luca Carati</div>
+                <div class="mobile-pnum">
+                    09<span> / 14</span>
+                </div>
+            </div>
+            <div class="mobile-info-panel">
+                <span class="exquisite-label">Exquisite Collection</span>
+                <h2 class="product-title">A Matter Of Light White Gold Ring</h2>
+                <p class="product-ref">REF: RN-3379</p>
+                <div class="gold-accent-line"></div>
+                <div class="price-display">QAR 18045</div>
+                <details class="accordion">
+                    <summary>The Piece</summary>
+                    <p>A statement forged in fire and finesse.</p>
+                </details>
+                <details class="accordion">
+                    <summary>Details</summary>
+                    <p>Gold Weight: 10.30 G<br>Diamond (Carat): RD 1.48 CT, VVS-G. <br>Gold Color: Rose<br>Resizable: No<br>Made In: Italy<br><br>Please note that product descriptions may vary slightly depending on size and craftsmanship variations.</p>
+                </details>
+                <div class="slide-actions">
+                    <button onclick="handleAction('Add to Bag', 'RN-3379', 'A Matter Of Light White Gold Ring', 'Luca Carati')" class="btn btn-primary">Add to Bag</button>
+                    <button onclick="handleAction('Advisor', 'RN-3379', 'A Matter Of Light White Gold Ring', 'Luca Carati')" class="btn btn-secondary-mobile">Speak with Advisor</button>
+                    <button onclick="handleAction('Buy Now', 'RN-3379', 'A Matter Of Light White Gold Ring', 'Luca Carati')" class="btn btn-secondary-mobile">Buy it Now</button>
+                    <div class="view-cart-link" onclick="pfMobile.flip(15)">View Products in Cart</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="page mobile-single-page" data-density="soft">
+        <div class="mobile-page-wrap">
+            <div class="mobile-img-panel" style="background-image: url('https://cdn.shopify.com/s/files/1/0707/3991/9016/files/RN-3393_06d9d07c-f336-46ad-9741-7c87e3156167.png?v=1754718873')">
+                <div class="vendor-tag">Luca Carati</div>
+                <div class="mobile-pnum">
+                    10<span> / 14</span>
+                </div>
+            </div>
+            <div class="mobile-info-panel">
+                <span class="exquisite-label">Exquisite Collection</span>
+                <h2 class="product-title">Art Deco Rose Gold Ring</h2>
+                <p class="product-ref">REF: RN-3393</p>
+                <div class="gold-accent-line"></div>
+                <div class="price-display">QAR 20853</div>
+                <details class="accordion">
+                    <summary>The Piece</summary>
+                    <p>A tactile signature of personal grandeur.</p>
+                </details>
+                <details class="accordion">
+                    <summary>Details</summary>
+                    <p>Gold Weight: 2.65 G<br>Diamond (Carat): RD 1.74 CT, VVS-G. <br>Gold Color: Rose<br>Resizable: No<br>Made In: Italy<br><br>Please note that product descriptions may vary slightly depending on size and craftsmanship variations.</p>
+                </details>
+                <div class="slide-actions">
+                    <button onclick="handleAction('Add to Bag', 'RN-3393', 'Art Deco Rose Gold Ring', 'Luca Carati')" class="btn btn-primary">Add to Bag</button>
+                    <button onclick="handleAction('Advisor', 'RN-3393', 'Art Deco Rose Gold Ring', 'Luca Carati')" class="btn btn-secondary-mobile">Speak with Advisor</button>
+                    <button onclick="handleAction('Buy Now', 'RN-3393', 'Art Deco Rose Gold Ring', 'Luca Carati')" class="btn btn-secondary-mobile">Buy it Now</button>
+                    <div class="view-cart-link" onclick="pfMobile.flip(15)">View Products in Cart</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="page mobile-single-page" data-density="soft">
+        <div class="mobile-page-wrap">
+            <div class="mobile-img-panel" style="background-image: url('https://cdn.shopify.com/s/files/1/0707/3991/9016/files/ER-2897_68d6f7f9-257d-4ea7-8444-013e435df720.jpg?v=1754718853')">
+                <div class="vendor-tag">Luca Carati</div>
+                <div class="mobile-pnum">
+                    11<span> / 14</span>
+                </div>
+            </div>
+            <div class="mobile-info-panel">
+                <span class="exquisite-label">Exquisite Collection</span>
+                <h2 class="product-title">A Matter Of Light Earrings</h2>
+                <p class="product-ref">REF: ER-2897</p>
+                <div class="gold-accent-line"></div>
+                <div class="price-display">QAR 12537</div>
+                <details class="accordion">
+                    <summary>The Piece</summary>
+                    <p>Sculpted arcs of allure, anchored in precious detail.</p>
+                </details>
+                <details class="accordion">
+                    <summary>Details</summary>
+                    <p>Gold Weight: 6.03 G<br>Diamond (Carat): RD 0.85 CT, VVS-G <br>Gold Color: White<br>Resizable: No<br>Made In: Italy<br><br>Please note that product descriptions may vary slightly depending on size and craftsmanship variations.</p>
+                </details>
+                <div class="slide-actions">
+                    <button onclick="handleAction('Add to Bag', 'ER-2897', 'A Matter Of Light Earrings', 'Luca Carati')" class="btn btn-primary">Add to Bag</button>
+                    <button onclick="handleAction('Advisor', 'ER-2897', 'A Matter Of Light Earrings', 'Luca Carati')" class="btn btn-secondary-mobile">Speak with Advisor</button>
+                    <button onclick="handleAction('Buy Now', 'ER-2897', 'A Matter Of Light Earrings', 'Luca Carati')" class="btn btn-secondary-mobile">Buy it Now</button>
+                    <div class="view-cart-link" onclick="pfMobile.flip(15)">View Products in Cart</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="page mobile-single-page" data-density="soft">
+        <div class="mobile-page-wrap">
+            <div class="mobile-img-panel" style="background-image: url('https://cdn.shopify.com/s/files/1/0707/3991/9016/files/NK-2063_cd5a7591-0624-4cf7-bbc9-4280f6e5c741.jpg?v=1754718841')">
+                <div class="vendor-tag">Luca Carati</div>
+                <div class="mobile-pnum">
+                    12<span> / 14</span>
+                </div>
+            </div>
+            <div class="mobile-info-panel">
+                <span class="exquisite-label">Exquisite Collection</span>
+                <h2 class="product-title">Natura Necklace- Malachite & Diamonds</h2>
+                <p class="product-ref">REF: NK-2063</p>
+                <div class="gold-accent-line"></div>
+                <div class="price-display">QAR 12348</div>
+                <details class="accordion">
+                    <summary>The Piece</summary>
+                    <p>A singular expression of artistry and flair.</p>
+                </details>
+                <details class="accordion">
+                    <summary>Details</summary>
+                    <p>Gold Weight: 6.06 G <br>Diamond (Carat): RD 0.71 CT, VVS-G. MC 1.10 G<br>Gold Color: Rose<br>Resizable: No<br>Made In: Italy<br><br>Please note that product descriptions may vary slightly depending on size and craftsmanship variations.</p>
+                </details>
+                <div class="slide-actions">
+                    <button onclick="handleAction('Add to Bag', 'NK-2063', 'Natura Necklace- Malachite & Diamonds', 'Luca Carati')" class="btn btn-primary">Add to Bag</button>
+                    <button onclick="handleAction('Advisor', 'NK-2063', 'Natura Necklace- Malachite & Diamonds', 'Luca Carati')" class="btn btn-secondary-mobile">Speak with Advisor</button>
+                    <button onclick="handleAction('Buy Now', 'NK-2063', 'Natura Necklace- Malachite & Diamonds', 'Luca Carati')" class="btn btn-secondary-mobile">Buy it Now</button>
+                    <div class="view-cart-link" onclick="pfMobile.flip(15)">View Products in Cart</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="page mobile-single-page" data-density="soft">
+        <div class="mobile-page-wrap">
+            <div class="mobile-img-panel" style="background-image: url('https://cdn.shopify.com/s/files/1/0707/3991/9016/files/NK-2056_c6804d71-68d2-40be-b926-a39d7b1b8626.jpg?v=1754718838')">
+                <div class="vendor-tag">Luca Carati</div>
+                <div class="mobile-pnum">
+                    13<span> / 14</span>
+                </div>
+            </div>
+            <div class="mobile-info-panel">
+                <span class="exquisite-label">Exquisite Collection</span>
+                <h2 class="product-title">Art Deco Round Necklace</h2>
+                <p class="product-ref">REF: NK-2056</p>
+                <div class="gold-accent-line"></div>
+                <div class="price-display">QAR 20061</div>
+                <details class="accordion">
+                    <summary>The Piece</summary>
+                    <p>A cascade of polished elegance draped in timeless charm.</p>
+                </details>
+                <details class="accordion">
+                    <summary>Details</summary>
+                    <p>Gold Weight: 8.94 G<br>Diamond (Carat): RD 1.32 CT, VVS-G <br>Gold Color: Rose<br>Resizable: No<br>Made In: Italy<br><br>Please note that product descriptions may vary slightly depending on size and craftsmanship variations.</p>
+                </details>
+                <div class="slide-actions">
+                    <button onclick="handleAction('Add to Bag', 'NK-2056', 'Art Deco Round Necklace', 'Luca Carati')" class="btn btn-primary">Add to Bag</button>
+                    <button onclick="handleAction('Advisor', 'NK-2056', 'Art Deco Round Necklace', 'Luca Carati')" class="btn btn-secondary-mobile">Speak with Advisor</button>
+                    <button onclick="handleAction('Buy Now', 'NK-2056', 'Art Deco Round Necklace', 'Luca Carati')" class="btn btn-secondary-mobile">Buy it Now</button>
+                    <div class="view-cart-link" onclick="pfMobile.flip(15)">View Products in Cart</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="page mobile-single-page" data-density="soft">
+        <div class="mobile-page-wrap">
+            <div class="mobile-img-panel" style="background-image: url('https://cdn.shopify.com/s/files/1/0707/3991/9016/files/NK-2580_ed9f722c-4214-4f4e-93ea-27146ac45bce.jpg?v=1754718833')">
+                <div class="vendor-tag">Luca Carati</div>
+                <div class="mobile-pnum">
+                    14<span> / 14</span>
+                </div>
+            </div>
+            <div class="mobile-info-panel">
+                <span class="exquisite-label">Exquisite Collection</span>
+                <h2 class="product-title">Art Deco Geometric Pendant Necklace</h2>
+                <p class="product-ref">REF: NK-2580</p>
+                <div class="gold-accent-line"></div>
+                <div class="price-display">QAR 19548</div>
+                <details class="accordion">
+                    <summary>The Piece</summary>
+                    <p>Echoes of Italian artistry in every deliberate curve.</p>
+                </details>
+                <details class="accordion">
+                    <summary>Details</summary>
+                    <p>Gold Weight: 8.04 G<br>Diamond (Carat): RD 1.31CT, VVS-G <br>Gold Color: Yellow<br>Resizable: No<br>Made In: Italy<br><br>Please note that product descriptions may vary slightly depending on size and craftsmanship variations.</p>
+                </details>
+                <div class="slide-actions">
+                    <button onclick="handleAction('Add to Bag', 'NK-2580', 'Art Deco Geometric Pendant Necklace', 'Luca Carati')" class="btn btn-primary">Add to Bag</button>
+                    <button onclick="handleAction('Advisor', 'NK-2580', 'Art Deco Geometric Pendant Necklace', 'Luca Carati')" class="btn btn-secondary-mobile">Speak with Advisor</button>
+                    <button onclick="handleAction('Buy Now', 'NK-2580', 'Art Deco Geometric Pendant Necklace', 'Luca Carati')" class="btn btn-secondary-mobile">Buy it Now</button>
+                    <div class="view-cart-link" onclick="pfMobile.flip(15)">View Products in Cart</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="page mobile-single-page" data-density="hard">
+        <div class="mobile-page-wrap">
+            <div class="mobile-info-panel cart-page">
+                <span class="chapter-label">YOUR SELECTION</span>
+                <h2 class="chapter-title">MY CART</h2>
+                <div class="gold-accent-line centered"></div>
+                <div id="cart-container-mobile" class="cart-items-container">
+                    <!-- Dynamic Cart Items -->
+                </div>
+                <button onclick="pfMobile.flip(1)" class="btn btn-secondary-mobile" style="margin-top:20px;">Back to Collections</button>
+            </div>
+        </div>
+    </div>
+    <div class="page mobile-single-page" data-density="hard">
+        <div class="page-content end-page mobile-end">
+            <div class="end-inner">
+                <img src="https://res.cloudinary.com/daucolvng/image/upload/f_auto,q_auto/BD_Logo_d4gza1" class="end-logo" alt="BD Logo">
+                <h2 class="chapter-title">THE END</h2>
+                <div class="gold-accent-line centered"></div>
+                <p class="end-message">Thank you for exploring.</p>
+                <button onclick="pfMobile.flip(1)" class="btn btn-primary" style="margin-top:20px;">Return to Collections</button>
+            </div>
+        </div>
+    </div>
+
+        </div>
+        <button id="mobile-prev" class="mobile-nav-btn prev" aria-label="Previous">&#8249;</button>
+        <button id="mobile-next" class="mobile-nav-btn next" aria-label="Next">&#8250;</button>
+    </div>
+
+    <div id="actionModal" class="custom-modal" onclick="handleModalBackdropClick(event)">
+        <div class="modal-content" id="modalInner"></div>
+    </div>
+
+    <div id="luxuryPopup" class="luxury-popup" onclick="handlePopupBackdropClick(event)">
+        <div class="luxury-popup-content" id="luxuryPopupInner">
+            <!-- Dynamic Product Details -->
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/page-flip@2.0.7/dist/js/page-flip.browser.min.js"></script>
+    <script>
+        let pf, pfMobile;
+        let currentPendingAction = null;
+        let catalogueProducts = [{"cart":[{"price":8775,"details":"Gold Weight: 4.79 G\nDiamond (Carat): RD 0.53 CT, VVS-G \nGold Color: Rose\nResizable: No\nMade In: Italy\n\nPlease note that product descriptions may vary slightly depending on size and craftsmanship variations.","description":"A cascade of polished elegance draped in timeless charm.","product_name":"Art Deco Star Necklace","vendor":"Luca Carati","product_code":"NK-2503","product_image":"https://cdn.shopify.com/s/files/1/0707/3991/9016/files/NK-2503_d612fd3f-98d5-414c-824a-8ed07009ad12.jpg?v=1754718837","tag":[{"name":"Art Deco","id":"7136289000003538769","color_code":null}],"Cart_Added_At":"2026-06-02T11:02:54+03:00"},{"price":12348,"details":"Gold Weight: 6.06 G \nDiamond (Carat): RD 0.71 CT, VVS-G. MC 1.10 G\nGold Color: Rose\nResizable: No\nMade In: Italy\n\nPlease note that product descriptions may vary slightly depending on size and craftsmanship variations.","description":"A singular expression of artistry and flair.","product_name":"Natura Necklace- Malachite & Diamonds","vendor":"Luca Carati","product_code":"NK-2063","product_image":"https://cdn.shopify.com/s/files/1/0707/3991/9016/files/NK-2063_cd5a7591-0624-4cf7-bbc9-4280f6e5c741.jpg?v=1754718841","tag":[{"name":"Natura","id":"7136289000003524793","color_code":null}],"Cart_Added_At":"2026-06-02T10:19:55+03:00"},{"price":20587,"details":"Gold Weight: 9.30G\nDiamond (Carat): RD 0.63 CT,VS1-VS2,F/G. MC 7.20 CT.  EM 0.28 CT\nGold Color: White\nResizable: No\nMade In: Italy\n\nPlease note that product descriptions may vary slightly depending on size and craftsmanship variations.","description":"Echoes of heritage in every facet and form. Accented with vibrant Malachite.","product_name":"Dancing Dots Necklace - Malachite","vendor":"Carlo Barberis","product_code":"NK-2613","product_image":"https://cdn.shopify.com/s/files/1/0707/3991/9016/files/NK-2613_3ae43c84-232c-4c90-ae82-98cf6b66ee6f.jpg?v=1754662903","tag":[{"name":"Dancing Dots","id":"7136289000003537658","color_code":null}],"Cart_Added_At":"2026-06-02T09:43:48+03:00"},{"price":9600,"details":"Gold Weight: 4.99 G\nDiamond (Carat): RD 0.41 CT VS-G ; MP 0.50 CT\nGold Color: Rose\nResizable: Yes\nMade In: Italy\n\nPlease note that product descriptions may vary slightly depending on size and craftsmanship variations.","description":"The Art Deco Ring, crafted in 18K Pink Gold (4.99g), is adorned with 0.41 CT VS-G round diamonds and a luminous 0.50 CT Mother of Pearl centre - timeless elegance with refined brilliance.","product_name":"Art Deco Diamonds MOP Open Ring","vendor":"Bijouq","product_code":"RN-7190","product_image":"https://cdn.shopify.com/s/files/1/0707/3991/9016/files/RN-7190_81ee7402-1a13-4374-a638-b262e1a5fa4c.jpg?v=1771780750","tag":[{"name":"Art Deco","id":"7136289000003538769","color_code":null}],"Cart_Added_At":"2026-06-02T09:12:10+03:00"},{"price":3790,"details":"Gold Weight: 2.25 G\nDiamond (Carat): RD 0.22 CT, VS-G.\nGold Color:White\nResizable: Yes\nMade In: Italy\n\nPlease note that product descriptions may vary slightly depending on size and craftsmanship variations.","description":"Green Stone Nail Ring designed in 18KW gold, with a weight of 2.25 G. Crafted with meticulous attention, it reflects character, structure, and individuality—ideal for collectors and connoisseurs of refined forms.","product_name":"Green Stone Nail Ring","vendor":"Bijouq","product_code":"NR-279","product_image":"https://cdn.shopify.com/s/files/1/0707/3991/9016/files/NR-279_jpg_08a6e55c-85d5-444a-836e-0757dd3a5705.jpg?v=1771912943","tag":[{"name":"Nail Rings","id":"7136289000003551247","color_code":null}],"Cart_Added_At":"2026-04-21T16:44:14+03:00"},{"price":3790,"details":"Gold Weight: 2.25 G\nDiamond (Carat): RD 0.22 CT, VS-G.\nGold Color:White\nResizable: Yes\nMade In: Italy\n\nPlease note that product descriptions may vary slightly depending on size and craftsmanship variations.","description":"Green Stone Nail Ring designed in 18KW gold, with a weight of 2.25 G. Crafted with meticulous attention, it reflects character, structure, and individuality—ideal for collectors and connoisseurs of refined forms.","product_name":"Green Stone Nail Ring","vendor":"Bijouq","product_code":"NR-279","product_image":"https://cdn.shopify.com/s/files/1/0707/3991/9016/files/NR-279_jpg_08a6e55c-85d5-444a-836e-0757dd3a5705.jpg?v=1771912943","tag":[{"name":"Nail Rings","id":"7136289000003551247","color_code":null}],"Cart_Added_At":"2026-04-21T16:44:14+03:00"},{"price":7461,"details":"Gold Weight: 4.24 G\nDiamond (Carat): RD 0.31 CT, VVS-G. PRS 1.00 CT \nGold Color: Rose\nResizable: No\nMade In: Italy\n\nPlease note that product descriptions may vary slightly depending on size and craftsmanship variations.","description":"Geometry meets emotion in this sculpted marvel.","product_name":"A Matter of Light Ring - Malachite","vendor":"Luca Carati","product_code":"RN-4386","product_image":"https://cdn.shopify.com/s/files/1/0707/3991/9016/files/RN-4386_df897979-55af-4c2b-80ab-fc8724d140d7.jpg?v=1771778860","tag":[{"name":"A Matter of Light","id":"7136289000003548263","color_code":null}],"Cart_Added_At":"2026-03-30T12:40:15+03:00"},{"price":18960,"details":"Gold Weight: 6.10G\nDiamond (Carat): RD 0.67 CT, VS1-VS2,F/G. TE 3.90 CT  \nGold Color: Rose\nResizable: No\nMade In: Italy\n\nPlease note that product descriptions may vary slightly depending on size and craftsmanship variations.","description":"Unapologetically radiant, unmistakably Carlo Barberis. Accented with golden Tiger Eye, brilliant Diamonds.","product_name":"Curl Earrings - Diamond & Tiger Eye","vendor":"Carlo Barberis","product_code":"ER-3791","product_image":"https://cdn.shopify.com/s/files/1/0707/3991/9016/files/ER-3791_baceb448-586a-4d07-ab70-6a7b2be9b9f6.jpg?v=1754662937","tag":[{"name":"Curl","id":"7136289000003552188","color_code":null}],"Cart_Added_At":"2026-03-27T09:43:55+03:00"},{"price":14440,"details":"Gold Weight: 9.70 G\nDiamond (Carat): RD 1.01 CT, VS-G\nGold Color: Rose\nResizable: Yes\nMade In: Italy\n\nPlease note that product descriptions may vary slightly depending on size and craftsmanship variations.","description":"Coccopelli Diamond Pendant- Small designed in 18KP gold, with a weight of 9.70 G. Crafted with meticulous attention, it reflects character, structure, and individuality—ideal for collectors and connoisseurs of refined forms.","product_name":"Coccopelli Diamond Pendant, Small","vendor":"Bijouq","product_code":"PN-2579","product_image":"https://cdn.shopify.com/s/files/1/0707/3991/9016/files/PN-2579_61dcf577-bcf7-4025-8858-8c1d51a935a1.jpg?v=1771780736","tag":[{"name":"Coccopelli","id":"7136289000003537655","color_code":null}],"Cart_Added_At":"2026-03-17T11:48:57+03:00"}]},{"price":14337,"details":"Gold Weight: 6.6 G \nDiamond (Carat): RD 0.83 CT, VVS-G. PRS 0.93 CT \nGold Color: Rose\nResizable: No\nMade In: Italy\n\nPlease note that product descriptions may vary slightly depending on size and craftsmanship variations.","description":"Elegance suspendedâ€”crafted for those who captivate silently.","product_name":"A Matter of Light Minimal Pearl Earrings","vendor":"Luca Carati","product_code":"ER-3681","product_image":"https://cdn.shopify.com/s/files/1/0707/3991/9016/files/ER-3681_a02656b6-1ada-41a3-bc99-1031c2fc84b0.jpg?v=1771778854"},{"price":14481,"details":"Gold Weight: 6.68 G\nDiamond (Carat): RD 0.82 CT, VVS-G. PRS 2.36 CT \nGold Color: Rose\nResizable: No\nMade In: Italy\n\nPlease note that product descriptions may vary slightly depending on size and craftsmanship variations.","description":"Elegance suspendedâ€”crafted for those who captivate silently.","product_name":"A Matter of Light Earrings - Malachite","vendor":"Luca Carati","product_code":"ER-3673","product_image":"https://cdn.shopify.com/s/files/1/0707/3991/9016/files/ER-3673_4f3f57ce-ae82-472a-9866-bbded15a7ee5.jpg?v=1771778851"},{"price":38340,"details":"Gold Weight: 24.91 G\nDiamond (Carat): RD 0.94 CT, VS-G \nGold Color: Rose\nResizable: No\nMade In: Italy\n\nPlease note that product descriptions may vary slightly depending on size and craftsmanship variations.","description":"Crafted to contour graceâ€”where geometry meets poetry.","product_name":"Deco Pendant Necklace","vendor":"Luca Carati","product_code":"NK-3613","product_image":"https://cdn.shopify.com/s/files/1/0707/3991/9016/files/NK-3613_42d443c7-7c02-4fcb-afff-758a1d6cd0eb.jpg?v=1771778875"},{"price":23328,"details":"Gold Weight: 11.24 G\nDiamond (Carat): RD 0.78 CT, VS-G\nGold Color: Rose\nResizable: No\nMade In: Italy\n\nPlease note that product descriptions may vary slightly depending on size and craftsmanship variations.","description":"Elegance suspendedâ€”crafted for those who captivate silently.","product_name":"Deco Earrings","vendor":"Luca Carati","product_code":"ER-5677","product_image":"https://cdn.shopify.com/s/files/1/0707/3991/9016/files/ER-5677_ffb5f009-8f29-41d3-9160-2ec3d503bc09.jpg?v=1771778857"},{"price":28233,"details":"Gold Weight: 8.42 G \nDiamond (Carat): RD 1.16 CT, VVS-G. PRS 0.95 CT \nGold Color: Rose\nResizable: No\nMade In: Italy\n\nPlease note that product descriptions may vary slightly depending on size and craftsmanship variations.","description":"Elegance suspendedâ€”crafted for those who captivate silently.","product_name":"A Matter of Light Earrings with Pearl","vendor":"Luca Carati","product_code":"ER-3678","product_image":"https://cdn.shopify.com/s/files/1/0707/3991/9016/files/ER-3678_756b876d-c6a6-4fc9-bc5c-b6743a1bf3ea.jpg?v=1771778853"},{"price":14931,"details":"Gold Weight: 7.41 G \nDiamond (Carat): RD 0.58 CT, VVS-G. PRS 0.47 CT \nGold Color: Rose\nResizable: No\nMade In: Italy\n\nPlease note that product descriptions may vary slightly depending on size and craftsmanship variations.","description":"Crafted to contour graceâ€”where geometry meets poetry.","product_name":"A Matter of Light Necklace with Pearl -Small","vendor":"Luca Carati","product_code":"NK-2509","product_image":"https://cdn.shopify.com/s/files/1/0707/3991/9016/files/NK-2509_068b2b05-b3e8-4754-ae67-59863f1bde8e.jpg?v=1771778837"},{"price":18864,"details":"Gold Weight: 7.55 G\nDiamond (Carat): RD 1.27 CT, VVS-G. MC 1.10 G \nGold Color: Rose\nResizable: No\nMade In: Italy\n\nPlease note that product descriptions may vary slightly depending on size and craftsmanship variations.","description":"Choreographed brilliance for your daily ballet of style.","product_name":"Natura Trefoil Stud Earrings - Malachite","vendor":"Luca Carati","product_code":"ER-2914","product_image":"https://cdn.shopify.com/s/files/1/0707/3991/9016/files/ER-2914_a1b87618-cf90-4e93-8164-024ee7798806.jpg?v=1754897205"},{"price":18045,"details":"Gold Weight: 10.30 G\nDiamond (Carat): RD 1.48 CT, VVS-G. \nGold Color: Rose\nResizable: No\nMade In: Italy\n\nPlease note that product descriptions may vary slightly depending on size and craftsmanship variations.","description":"A statement forged in fire and finesse.","product_name":"A Matter Of Light White Gold Ring","vendor":"Luca Carati","product_code":"RN-3379","product_image":"https://cdn.shopify.com/s/files/1/0707/3991/9016/files/RN-3379_13a04a4d-ba79-4246-b851-d85f914afbf1.jpg?v=1754718861"},{"price":20853,"details":"Gold Weight: 2.65 G\nDiamond (Carat): RD 1.74 CT, VVS-G. \nGold Color: Rose\nResizable: No\nMade In: Italy\n\nPlease note that product descriptions may vary slightly depending on size and craftsmanship variations.","description":"A tactile signature of personal grandeur.","product_name":"Art Deco Rose Gold Ring","vendor":"Luca Carati","product_code":"RN-3393","product_image":"https://cdn.shopify.com/s/files/1/0707/3991/9016/files/RN-3393_06d9d07c-f336-46ad-9741-7c87e3156167.png?v=1754718873"},{"price":12537,"details":"Gold Weight: 6.03 G\nDiamond (Carat): RD 0.85 CT, VVS-G \nGold Color: White\nResizable: No\nMade In: Italy\n\nPlease note that product descriptions may vary slightly depending on size and craftsmanship variations.","description":"Sculpted arcs of allure, anchored in precious detail.","product_name":"A Matter Of Light Earrings","vendor":"Luca Carati","product_code":"ER-2897","product_image":"https://cdn.shopify.com/s/files/1/0707/3991/9016/files/ER-2897_68d6f7f9-257d-4ea7-8444-013e435df720.jpg?v=1754718853"},{"price":12348,"details":"Gold Weight: 6.06 G \nDiamond (Carat): RD 0.71 CT, VVS-G. MC 1.10 G\nGold Color: Rose\nResizable: No\nMade In: Italy\n\nPlease note that product descriptions may vary slightly depending on size and craftsmanship variations.","description":"A singular expression of artistry and flair.","product_name":"Natura Necklace- Malachite & Diamonds","vendor":"Luca Carati","product_code":"NK-2063","product_image":"https://cdn.shopify.com/s/files/1/0707/3991/9016/files/NK-2063_cd5a7591-0624-4cf7-bbc9-4280f6e5c741.jpg?v=1754718841"},{"price":20061,"details":"Gold Weight: 8.94 G\nDiamond (Carat): RD 1.32 CT, VVS-G \nGold Color: Rose\nResizable: No\nMade In: Italy\n\nPlease note that product descriptions may vary slightly depending on size and craftsmanship variations.","description":"A cascade of polished elegance draped in timeless charm.","product_name":"Art Deco Round Necklace","vendor":"Luca Carati","product_code":"NK-2056","product_image":"https://cdn.shopify.com/s/files/1/0707/3991/9016/files/NK-2056_c6804d71-68d2-40be-b926-a39d7b1b8626.jpg?v=1754718838"},{"price":19548,"details":"Gold Weight: 8.04 G\nDiamond (Carat): RD 1.31CT, VVS-G \nGold Color: Yellow\nResizable: No\nMade In: Italy\n\nPlease note that product descriptions may vary slightly depending on size and craftsmanship variations.","description":"Echoes of Italian artistry in every deliberate curve.","product_name":"Art Deco Geometric Pendant Necklace","vendor":"Luca Carati","product_code":"NK-2580","product_image":"https://cdn.shopify.com/s/files/1/0707/3991/9016/files/NK-2580_ed9f722c-4214-4f4e-93ea-27146ac45bce.jpg?v=1754718833"}];
+        let cartData = [{"price":8775,"details":"Gold Weight: 4.79 G\nDiamond (Carat): RD 0.53 CT, VVS-G \nGold Color: Rose\nResizable: No\nMade In: Italy\n\nPlease note that product descriptions may vary slightly depending on size and craftsmanship variations.","description":"A cascade of polished elegance draped in timeless charm.","product_name":"Art Deco Star Necklace","vendor":"Luca Carati","product_code":"NK-2503","product_image":"https://cdn.shopify.com/s/files/1/0707/3991/9016/files/NK-2503_d612fd3f-98d5-414c-824a-8ed07009ad12.jpg?v=1754718837","tag":[{"name":"Art Deco","id":"7136289000003538769","color_code":null}],"Cart_Added_At":"2026-06-02T11:02:54+03:00"},{"price":12348,"details":"Gold Weight: 6.06 G \nDiamond (Carat): RD 0.71 CT, VVS-G. MC 1.10 G\nGold Color: Rose\nResizable: No\nMade In: Italy\n\nPlease note that product descriptions may vary slightly depending on size and craftsmanship variations.","description":"A singular expression of artistry and flair.","product_name":"Natura Necklace- Malachite & Diamonds","vendor":"Luca Carati","product_code":"NK-2063","product_image":"https://cdn.shopify.com/s/files/1/0707/3991/9016/files/NK-2063_cd5a7591-0624-4cf7-bbc9-4280f6e5c741.jpg?v=1754718841","tag":[{"name":"Natura","id":"7136289000003524793","color_code":null}],"Cart_Added_At":"2026-06-02T10:19:55+03:00"},{"price":20587,"details":"Gold Weight: 9.30G\nDiamond (Carat): RD 0.63 CT,VS1-VS2,F/G. MC 7.20 CT.  EM 0.28 CT\nGold Color: White\nResizable: No\nMade In: Italy\n\nPlease note that product descriptions may vary slightly depending on size and craftsmanship variations.","description":"Echoes of heritage in every facet and form. Accented with vibrant Malachite.","product_name":"Dancing Dots Necklace - Malachite","vendor":"Carlo Barberis","product_code":"NK-2613","product_image":"https://cdn.shopify.com/s/files/1/0707/3991/9016/files/NK-2613_3ae43c84-232c-4c90-ae82-98cf6b66ee6f.jpg?v=1754662903","tag":[{"name":"Dancing Dots","id":"7136289000003537658","color_code":null}],"Cart_Added_At":"2026-06-02T09:43:48+03:00"},{"price":9600,"details":"Gold Weight: 4.99 G\nDiamond (Carat): RD 0.41 CT VS-G ; MP 0.50 CT\nGold Color: Rose\nResizable: Yes\nMade In: Italy\n\nPlease note that product descriptions may vary slightly depending on size and craftsmanship variations.","description":"The Art Deco Ring, crafted in 18K Pink Gold (4.99g), is adorned with 0.41 CT VS-G round diamonds and a luminous 0.50 CT Mother of Pearl centre - timeless elegance with refined brilliance.","product_name":"Art Deco Diamonds MOP Open Ring","vendor":"Bijouq","product_code":"RN-7190","product_image":"https://cdn.shopify.com/s/files/1/0707/3991/9016/files/RN-7190_81ee7402-1a13-4374-a638-b262e1a5fa4c.jpg?v=1771780750","tag":[{"name":"Art Deco","id":"7136289000003538769","color_code":null}],"Cart_Added_At":"2026-06-02T09:12:10+03:00"},{"price":3790,"details":"Gold Weight: 2.25 G\nDiamond (Carat): RD 0.22 CT, VS-G.\nGold Color:White\nResizable: Yes\nMade In: Italy\n\nPlease note that product descriptions may vary slightly depending on size and craftsmanship variations.","description":"Green Stone Nail Ring designed in 18KW gold, with a weight of 2.25 G. Crafted with meticulous attention, it reflects character, structure, and individuality—ideal for collectors and connoisseurs of refined forms.","product_name":"Green Stone Nail Ring","vendor":"Bijouq","product_code":"NR-279","product_image":"https://cdn.shopify.com/s/files/1/0707/3991/9016/files/NR-279_jpg_08a6e55c-85d5-444a-836e-0757dd3a5705.jpg?v=1771912943","tag":[{"name":"Nail Rings","id":"7136289000003551247","color_code":null}],"Cart_Added_At":"2026-04-21T16:44:14+03:00"},{"price":3790,"details":"Gold Weight: 2.25 G\nDiamond (Carat): RD 0.22 CT, VS-G.\nGold Color:White\nResizable: Yes\nMade In: Italy\n\nPlease note that product descriptions may vary slightly depending on size and craftsmanship variations.","description":"Green Stone Nail Ring designed in 18KW gold, with a weight of 2.25 G. Crafted with meticulous attention, it reflects character, structure, and individuality—ideal for collectors and connoisseurs of refined forms.","product_name":"Green Stone Nail Ring","vendor":"Bijouq","product_code":"NR-279","product_image":"https://cdn.shopify.com/s/files/1/0707/3991/9016/files/NR-279_jpg_08a6e55c-85d5-444a-836e-0757dd3a5705.jpg?v=1771912943","tag":[{"name":"Nail Rings","id":"7136289000003551247","color_code":null}],"Cart_Added_At":"2026-04-21T16:44:14+03:00"},{"price":7461,"details":"Gold Weight: 4.24 G\nDiamond (Carat): RD 0.31 CT, VVS-G. PRS 1.00 CT \nGold Color: Rose\nResizable: No\nMade In: Italy\n\nPlease note that product descriptions may vary slightly depending on size and craftsmanship variations.","description":"Geometry meets emotion in this sculpted marvel.","product_name":"A Matter of Light Ring - Malachite","vendor":"Luca Carati","product_code":"RN-4386","product_image":"https://cdn.shopify.com/s/files/1/0707/3991/9016/files/RN-4386_df897979-55af-4c2b-80ab-fc8724d140d7.jpg?v=1771778860","tag":[{"name":"A Matter of Light","id":"7136289000003548263","color_code":null}],"Cart_Added_At":"2026-03-30T12:40:15+03:00"},{"price":18960,"details":"Gold Weight: 6.10G\nDiamond (Carat): RD 0.67 CT, VS1-VS2,F/G. TE 3.90 CT  \nGold Color: Rose\nResizable: No\nMade In: Italy\n\nPlease note that product descriptions may vary slightly depending on size and craftsmanship variations.","description":"Unapologetically radiant, unmistakably Carlo Barberis. Accented with golden Tiger Eye, brilliant Diamonds.","product_name":"Curl Earrings - Diamond & Tiger Eye","vendor":"Carlo Barberis","product_code":"ER-3791","product_image":"https://cdn.shopify.com/s/files/1/0707/3991/9016/files/ER-3791_baceb448-586a-4d07-ab70-6a7b2be9b9f6.jpg?v=1754662937","tag":[{"name":"Curl","id":"7136289000003552188","color_code":null}],"Cart_Added_At":"2026-03-27T09:43:55+03:00"},{"price":14440,"details":"Gold Weight: 9.70 G\nDiamond (Carat): RD 1.01 CT, VS-G\nGold Color: Rose\nResizable: Yes\nMade In: Italy\n\nPlease note that product descriptions may vary slightly depending on size and craftsmanship variations.","description":"Coccopelli Diamond Pendant- Small designed in 18KP gold, with a weight of 9.70 G. Crafted with meticulous attention, it reflects character, structure, and individuality—ideal for collectors and connoisseurs of refined forms.","product_name":"Coccopelli Diamond Pendant, Small","vendor":"Bijouq","product_code":"PN-2579","product_image":"https://cdn.shopify.com/s/files/1/0707/3991/9016/files/PN-2579_61dcf577-bcf7-4025-8858-8c1d51a935a1.jpg?v=1771780736","tag":[{"name":"Coccopelli","id":"7136289000003537655","color_code":null}],"Cart_Added_At":"2026-03-17T11:48:57+03:00"}];
+
+        function handleModalBackdropClick(e) { if (e.target === document.getElementById('actionModal')) closeModal(); }
+        function handlePopupBackdropClick(e) { if (e.target === document.getElementById('luxuryPopup')) closeLuxuryPopup(); }
+
+        function getDeviceFingerprint() {
+            var components = [navigator.userAgent, navigator.language, screen.width + 'x' + screen.height, screen.colorDepth, new Date().getTimezoneOffset(), navigator.hardwareConcurrency || '', navigator.deviceMemory || '', navigator.platform || ''].join('|');
+            var hash = 0;
+            for (var i = 0; i < components.length; i++) { hash = ((hash << 5) - hash) + components.charCodeAt(i); hash |= 0; }
+            return Math.abs(hash).toString(36);
+        }
+
+        window.onload = () => {
+            const vw = window.innerWidth;
+            const vh = window.innerHeight;
+            
+            updateCartUI();
+
+            if (vw > 900) {
+                const SPREAD_RATIO = 733 / 1100;
+                const maxW = Math.floor(vw * 0.90);
+                const maxH = Math.floor(vh * 0.90);
+                let bookW = maxW; let bookH = Math.round(bookW * SPREAD_RATIO);
+                if (bookH > maxH) { bookH = maxH; bookW = Math.round(bookH / SPREAD_RATIO); }
+                if (bookW % 2 !== 0) bookW--;
+                const pageW = bookW / 2;
+
+                const flipbookEl = document.getElementById('flipbook');
+                flipbookEl.style.width  = bookW + 'px';
+                flipbookEl.style.height = bookH + 'px';
+                flipbookEl.style.margin = '0 auto';
+                flipbookEl.style.position = 'relative';
+
+                document.querySelectorAll('.desktop-wrapper .page').forEach(p => {
+                    p.style.width  = pageW + 'px';
+                    p.style.height = bookH + 'px';
+                });
+
+                pf = new St.PageFlip(flipbookEl, {
+                    width: pageW, height: bookH,
+                    minWidth: pageW, minHeight: bookH,
+                    maxWidth: pageW, maxHeight: bookH,
+                    size: 'fixed', showCover: true, autoSize: false, drawShadow: true, flippingTime: 1000, usePortrait: false, startPage: 0
+                });
+                pf.loadFromHTML(document.querySelectorAll('.desktop-wrapper .page'));
+            } else {
+                const maxW = Math.floor(vw * 0.95);
+                const maxH = Math.floor(vh * 0.92);
+                const flipbookEl = document.getElementById('mobile-flipbook');
+                flipbookEl.style.width  = maxW + 'px';
+                flipbookEl.style.height = maxH + 'px';
+
+                document.querySelectorAll('.mobile-wrapper .page').forEach(p => {
+                    p.style.width  = maxW + 'px';
+                    p.style.height = maxH + 'px';
+                });
+
+                pfMobile = new St.PageFlip(flipbookEl, {
+                    width: maxW, height: maxH,
+                    minWidth: maxW, minHeight: maxH,
+                    maxWidth: maxW, maxHeight: maxH,
+                    size: 'fixed', showCover: true, autoSize: false, drawShadow: true, flippingTime: 800, swipeDistance: 30, startPage: 0, clickEventForward: false, useMouseEvents: false
+                });
+                pfMobile.loadFromHTML(document.querySelectorAll('.mobile-wrapper .page'));
+
+                document.getElementById('mobile-prev').onclick = () => pfMobile.flipPrev();
+                document.getElementById('mobile-next').onclick = () => pfMobile.flipNext();
+
+                pfMobile.on('flip', (e) => {
+                    if (e.data === 0) document.body.classList.add('on-cover');
+                    else document.body.classList.remove('on-cover');
+                });
+                document.body.classList.add('on-cover');
+            }
+
+            // Hide loading screen
+            setTimeout(() => {
+                const loader = document.getElementById('loading-screen');
+                loader.style.opacity = '0';
+                setTimeout(() => { loader.style.display = 'none'; }, 800);
+            }, 1500);
+        };
+
+        function updateCartUI() {
+            const desktopContainer = document.getElementById('cart-container-desktop');
+            const mobileContainer = document.getElementById('cart-container-mobile');
+            
+            const cartHTML = cartData.length > 0 ? cartData.map((item, idx) => `
+                <div class="cart-item" onclick="showLuxuryProduct(${idx})">
+                    <div class="cart-item-img" style="background-image: url('${item.product_image}')"></div>
+                    <div class="cart-item-info">
+                        <h4>${item.product_name}</h4>
+                        <p>QAR ${item.price}</p>
+                        <div class="cart-item-actions">
+                            <button onclick="event.stopPropagation(); handleAction('Advisor', '${item.product_code}', '${item.product_name}', '${item.vendor}')" class="cart-btn">Advisor</button>
+                            <button onclick="event.stopPropagation(); handleAction('Buy Now', '${item.product_code}', '${item.product_name}', '${item.vendor}')" class="cart-btn gold">Buy Now</button>
+                        </div>
+                    </div>
+                </div>
+            `).join('') : '<p class="empty-msg">Your collection is waiting to be discovered.</p>';
+
+            if (desktopContainer) desktopContainer.innerHTML = cartHTML;
+            if (mobileContainer) mobileContainer.innerHTML = cartHTML;
+        }
+
+        function showLuxuryProduct(idx) {
+            if (pf) popupReturnPageDesktop = pf.getCurrentPageIndex();
+            if (pfMobile) popupReturnPageMobile = pfMobile.getCurrentPageIndex();
+
+            const item = cartData[idx];
+            const popup = document.getElementById('luxuryPopup');
+            const inner = document.getElementById('luxuryPopupInner');
+            
+            inner.innerHTML = `
+                <button class="luxury-close" onclick="closeLuxuryPopup()">&times;</button>
+                <div class="luxury-popup-img" style="background-image: url('${item.product_image}')"></div>
+                <div class="luxury-popup-details">
+                    <span class="exquisite-label">${(item.tag && item.tag[0] && item.tag[0].name) || 'COLLECTION'}</span>
+                    <h2 class="product-title">${item.product_name}</h2>
+                    <p class="product-ref">REF: ${item.product_code}</p>
+                    <div class="gold-accent-line"></div>
+                    <div class="narrative-box">
+                        <label>The Piece</label>
+                        <p>${item.description}</p>
+                        <label>Details</label>
+                        <p>${item.details ? item.details.replace(/\\n/g, '<br>') : 'Exclusively available at Blue Diamond Jewellery.'}</p>
+                    </div>
+                    <div class="price-container">QAR ${item.price}</div>
+                    <div class="button-group">
+                        <button onclick="handleAction('Advisor', '${item.product_code}', '${item.product_name}', '${item.vendor}')" class="btn btn-primary">Speak with Advisor</button>
+                        <button onclick="handleAction('Buy Now', '${item.product_code}', '${item.product_name}', '${item.vendor}')" class="btn btn-secondary">Buy it Now</button>
+                    </div>
+                </div>
+            `;
+            popup.style.display = 'flex';
+        }
+
+        function closeLuxuryPopup() { 
+            document.getElementById('luxuryPopup').style.display = 'none';
+            if (pf && popupReturnPageDesktop !== null) pf.flip(popupReturnPageDesktop);
+            if (pfMobile && popupReturnPageMobile !== null) pfMobile.flip(popupReturnPageMobile);
+        }
+
+        function handleAction(type, code, name, vendor) {
+            const savedData = localStorage.getItem('bd_user_info');
+            const userInfo = savedData ? JSON.parse(savedData) : null;
+            
+            if (type === 'Advisor') {
+                showSmartForm(type, code, name, vendor, false);
+                return;
+            }
+            
+            if (!userInfo || !userInfo.name || !userInfo.phone) {
+                showSmartForm(type, code, name, vendor, type === 'Add to Bag');
+            } else {
+                if (type === 'Add to Bag') {
+                    const product = catalogueProducts.find(p => p.product_code === code);
+                    if (product) {
+                        const exists = cartData.some(item => item.product_code === code);
+                        if (!exists) {
+                            cartData.push(product);
+                            updateCartUI();
+                        }
+                    }
+                }
+                sendAction(type, code, name, vendor, userInfo);
+            }
+        }
+
+        function toggleCustomCountry() {
+            const select = document.getElementById('formCountryCode');
+            const customRow = document.getElementById('customCountryCodeRow');
+            customRow.style.display = select.value === 'CUSTOM' ? 'block' : 'none';
+        }
+
+        function showSmartForm(type, code, name, vendor, isAddToCart = false) {
+            currentPendingAction = { type, code, name, vendor };
+            const modal = document.getElementById('actionModal');
+            const inner = document.getElementById('modalInner');
+            const savedData = localStorage.getItem('bd_user_info');
+            const userInfo = savedData ? JSON.parse(savedData) : { name: '', phone: '', countryCode: '+974', brands: [], stone: '' };
+            
+            let formTitle = "Connect with Advisor";
+            let formDesc = "Confirm your details for a personalized consultation.";
+            
+            if (type === 'Buy Now') {
+                formTitle = "Secure Purchase";
+                formDesc = "Please provide your contact details to finalize your purchase.";
+            } else if (type === 'Add to Bag') {
+                formTitle = "Add to Collection";
+                formDesc = "Please provide your contact details to save this piece to your bag.";
+            }
+
+            const brands = ["Bijouq", "J Jewels", "Palmyra", "Noi", "Giloro", "Carlo Barberis", "Cashmere", "Luca Carati", "All Brands"];
+            const brandCheckboxes = brands.map(b => `<label class="brand-option"><input type="checkbox" name="brands" value="${b}" ${userInfo.brands && userInfo.brands.includes(b) ? 'checked' : ''}> ${b}</label>`).join('');
+
+            const isSimplified = type === 'Buy Now' || type === 'Add to Bag';
+
+            inner.innerHTML = `
+                <button class="modal-x-close" onclick="closeModal()" aria-label="Close">&times;</button>
+                <h3>${formTitle}</h3>
+                <p>${formDesc}</p>
+                <form class="smart-form" onsubmit="submitSmartForm(event)">
+                    <div class="form-group"><label>Full Name</label><input type="text" id="formName" required placeholder="Enter your name" value="${userInfo.name || ''}"></div>
+                    <div class="form-group">
+                        <label>Contact Number</label>
+                        <div class="phone-input-container">
+                            <select id="formCountryCode" onchange="toggleCustomCountry()">
+                                <option value="+974" ${userInfo.countryCode === '+974' ? 'selected' : ''}>QA +974</option>
+                                <option value="+966" ${userInfo.countryCode === '+966' ? 'selected' : ''}>SA +966</option>
+                                <option value="+971" ${userInfo.countryCode === '+971' ? 'selected' : ''}>UAE +971</option>
+                                <option value="+965" ${userInfo.countryCode === '+965' ? 'selected' : ''}>KW +965</option>
+                                <option value="+968" ${userInfo.countryCode === '+968' ? 'selected' : ''}>OM +968</option>
+                                <option value="+973" ${userInfo.countryCode === '+973' ? 'selected' : ''}>BH +973</option>
+                                <option value="CUSTOM">Other...</option>
+                            </select>
+                            <input type="tel" id="formPhone" required placeholder="Phone number" value="${userInfo.phone || ''}">
+                        </div>
+                        <div id="customCountryCodeRow"><input type="text" id="formCustomCountry" placeholder="Enter Country Code (e.g. +39)"></div>
+                    </div>
+                    ${!isSimplified ? `
+                    <div class="form-group"><label>Preferred Brands</label><div class="brand-grid">${brandCheckboxes}</div></div>
+                    <div class="form-group">
+                        <label>Stone Preference <span class="optional-tag">(Optional)</span></label>
+                        <input type="text" id="formStone" placeholder="Type stone preference" value="${userInfo.stone || ''}">
+                    </div>
+                    <div class="form-group">
+                        <label>Occasion <span class="optional-tag">(Optional)</span></label>
+                        <select id="formOccasion">
+                            <option value="">Select an occasion</option>
+                            <option value="Wedding">Wedding</option>
+                            <option value="Anniversary">Anniversary</option>
+                            <option value="Birthday">Birthday</option>
+                            <option value="Gift">Gift</option>
+                            <option value="Investment">Investment</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    ` : ''}
+                    <button type="submit" class="form-submit">${isAddToCart ? 'Add to Bag' : 'Confirm'}</button>
+                </form>
+            `;
+            modal.style.display = 'flex';
+        }
+
+        function submitSmartForm(event) {
+            event.preventDefault();
+            const countrySelect = document.getElementById('formCountryCode');
+            let countryCode = countrySelect.value === 'CUSTOM' ? document.getElementById('formCustomCountry').value || '' : countrySelect.value;
+            const brandEls = document.querySelectorAll('input[name="brands"]:checked');
+            const selectedBrands = brandEls.length > 0 ? Array.from(brandEls).map(cb => cb.value) : [];
+            const stoneEl = document.getElementById('formStone');
+            const occasionEl = document.getElementById('formOccasion');
+            
+            const userInfo = { 
+                name: document.getElementById('formName').value, 
+                phone: document.getElementById('formPhone').value, 
+                countryCode: countryCode, 
+                brands: selectedBrands, 
+                stone: stoneEl ? stoneEl.value : '', 
+                occasion: occasionEl ? occasionEl.value : '' 
+            };
+            
+            localStorage.setItem('bd_user_info', JSON.stringify({ 
+                name: userInfo.name, phone: userInfo.phone, countryCode: userInfo.countryCode, brands: userInfo.brands, stone: userInfo.stone 
+            }));
+            
+            if (currentPendingAction) {
+                if (currentPendingAction.type === 'Add to Bag') {
+                    const product = catalogueProducts.find(p => p.product_code === currentPendingAction.code);
+                    if (product) {
+                        const exists = cartData.some(item => item.product_code === currentPendingAction.code);
+                        if (!exists) { cartData.push(product); updateCartUI(); }
+                    }
+                }
+                sendAction(currentPendingAction.type, currentPendingAction.code, currentPendingAction.name, currentPendingAction.vendor, userInfo);
+            }
+        }
+
+        async function sendAction(type, code, name, vendor, userInfo = {}) {
+            const modal = document.getElementById('actionModal');
+            const inner = document.getElementById('modalInner');
+            let title = "Request Sent";
+            let message = `Thank you, ${userInfo.name || 'valued client'}. An advisor has been notified about your interest in ${name} (${code}). They will connect with you shortly.`;
+            
+            if (type === 'Add to Bag') {
+                title = "Added to Bag";
+                message = `${name} has been added to your selection. You can view it in your cart at the end of the catalogue.`;
+            } else if (type === 'Buy Now') {
+                title = "Processing Order";
+                message = `We are preparing your order for ${name}. Our concierge will contact you to finalize the payment and delivery.`;
+            }
+
+            inner.innerHTML = `<button class="modal-x-close" onclick="closeModal()" aria-label="Close">&times;</button><h3>${title}</h3><p>${message}</p><button class="modal-close" onclick="closeModal()">Close</button>`;
+            modal.style.display = 'flex';
+            
+            try {
+                const webhookUrl = 'https://n8n.srv1138489.hstgr.cloud/webhook/weblink-buttons';
+                await fetch(webhookUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: type, productCode: code, productName: name, vendor: vendor, pageUrl: window.location.href, deviceFingerprint: getDeviceFingerprint(), customerName: userInfo.name || null, customerPhone: (userInfo.countryCode || '') + (userInfo.phone || ''), preferredBrands: userInfo.brands || [], stonePreference: userInfo.stone || null, occasion: userInfo.occasion || null, timestamp: new Date().toISOString() }) });
+            } catch (error) { console.error("Error sending webhook:", error); }
+            if (window.parent && window.parent.postMessage) window.parent.postMessage({ type, productCode: code, productName: name, vendor, userInfo }, '*');
+        }
+
+        function closeModal() { document.getElementById('actionModal').style.display = 'none'; }
+    </script>
+</body>
+</html>
