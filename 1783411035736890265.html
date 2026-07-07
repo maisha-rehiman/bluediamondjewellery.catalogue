@@ -1,0 +1,1503 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Cinzel:wght@300;400&display=swap" rel="stylesheet">
+    <title>Catalogue | Blue Diamond Jewellery</title>
+    <style>
+        :root {
+            --gold: #C5A059;
+            --black: #0a0a0a;
+            --paper: #fcfaf7;
+            --muted: #999;
+            --border: #e8e2d9;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        /* Gold Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: rgba(197, 160, 89, 0.05); }
+        ::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 10px; border: 1px solid rgba(0,0,0,0.1); }
+        ::-webkit-scrollbar-thumb:hover { background: #b08e4d; }
+
+        body {
+            background: #000;
+            font-family: 'Times New Roman', Times, serif;
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        /* ── Loading Screen ── */
+        #loading-screen {
+            position: fixed; inset: 0;
+            background: #080706;
+            z-index: 9999;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            transition: opacity 0.8s ease-out;
+        }
+        .loading-vignette { position: absolute; inset: 0; background: radial-gradient(circle at center, transparent 0%, rgba(0,0,0,0.8) 100%); }
+        .loading-content { position: relative; z-index: 10; text-align: center; }
+        .loading-text { font-family: 'Cinzel', serif; color: var(--gold); letter-spacing: 8px; font-size: 0.8rem; text-transform: uppercase; animation: pulse 2s infinite; }
+        .loading-bar-container { width: 120px; height: 1px; background: rgba(197,160,89,0.2); margin: 20px auto; position: relative; overflow: hidden; }
+        .loading-bar { position: absolute; left: -100%; width: 100%; height: 100%; background: var(--gold); animation: loading 2s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
+        @keyframes loading { 0% { left: -100%; } 100% { left: 100%; } }
+
+        .exquisite-label { display: block; color: var(--gold); letter-spacing: 3px; font-size: 0.6rem; text-transform: uppercase; font-family: sans-serif; margin-bottom: 10px; }
+        .product-title { color: #111; font-weight: normal; font-size: 1.35rem; line-height: 1.3; margin-bottom: 5px; }
+        .product-ref { color: var(--muted); font-size: 0.55rem; font-family: sans-serif; letter-spacing: 2px; text-transform: uppercase; }
+        .gold-accent-line { width: 36px; height: 1px; background: var(--gold); margin: 18px 0; }
+        .gold-accent-line.centered { margin-left: auto; margin-right: auto; }
+
+        .editorial-index { background: var(--paper); height: 100%; padding: 40px; display: flex; flex-direction: column; position: relative; }
+        .index-inner { width: 100%; max-width: 500px; margin: 0 auto; display: flex; flex-direction: column; height: 100%; }
+        .index-inner.index-with-margins { max-width: 380px; }
+        .index-inner.centered-content { justify-content: center; align-items: center; text-align: center; }
+        .index-header-sticky { flex-shrink: 0; text-align: center; padding-bottom: 20px; background: var(--paper); z-index: 5; }
+        .chapter-label { display: block; font-family: sans-serif; font-size: 0.6rem; letter-spacing: 4px; color: var(--gold); margin-bottom: 15px; text-align: center; }
+        .chapter-title { font-family: 'Cinzel', serif; font-size: 1.8rem; color: #111; letter-spacing: 4px; text-align: center; }
+        .index-grid { flex: 1; overflow-y: auto; padding: 20px 0; display: flex; flex-direction: column; gap: 15px; }
+        .index-row { display: flex; align-items: baseline; cursor: pointer; transition: 0.3s; padding: 5px 0; }
+        .index-row:hover { opacity: 0.6; }
+        .index-tag-name { font-family: 'Cinzel', serif; font-size: 0.95rem; color: #111; letter-spacing: 2px; flex-shrink: 0; }
+        .index-dots { flex: 1; border-bottom: 1px dotted #ccc; margin: 0 10px; position: relative; top: -4px; }
+        .index-tag-count { font-size: 0.6rem; color: var(--gold); font-family: sans-serif; letter-spacing: 1px; flex-shrink: 0; }
+
+
+        /* Button Styles */
+        .btn { padding: 14px; cursor: pointer; transition: background 0.25s, color 0.25s, border-color 0.25s; font-family: sans-serif; font-size: 0.6rem; letter-spacing: 2px; text-transform: uppercase; border: 1px solid var(--gold); }
+        .btn-primary { width: 100%; background: var(--black); color: #fff; border-color: var(--black); margin-bottom: 9px; }
+        .btn-primary:hover { background: var(--gold); border-color: var(--gold); }
+        .btn-secondary { width: 100%; background: transparent; color: var(--black); border-color: var(--black); transition: all 0.3s; }
+        .btn-secondary:hover { background: var(--gold); color: #fff; border-color: var(--gold); }
+        .btn-secondary-mobile { width: 100%; background: transparent; color: var(--black); border-color: var(--black); margin-top: 10px; }
+        
+        .button-group { margin-top: 20px; display: flex; flex-direction: column; gap: 8px; }
+        .secondary-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .view-cart-link { text-align: center; font-size: 0.65rem; color: var(--gold); text-decoration: underline; cursor: pointer; margin-top: 12px; font-family: sans-serif; letter-spacing: 1px; text-transform: uppercase; }
+
+        .vendor-tag, .vendor-overlay-box { position: absolute; top: 16px; left: 16px; background: #fff; padding: 7px 14px; color: var(--gold); font-family: sans-serif; font-size: 0.5rem; font-weight: bold; text-transform: uppercase; border: 1px solid #f0ece6; z-index: 5; }
+
+        .accordion { border-top: 1px solid var(--border); }
+        .accordion:last-of-type { border-bottom: 1px solid var(--border); }
+        .accordion summary { list-style: none; display: flex; justify-content: space-between; align-items: center; padding: 12px 0; font-family: sans-serif; font-size: 0.58rem; letter-spacing: 2px; text-transform: uppercase; color: var(--gold); cursor: pointer; outline: none; user-select: none; }
+        .accordion summary::-webkit-details-marker { display: none; }
+        .accordion summary::after { content: '+'; font-size: 1rem; }
+        .accordion[open] summary::after { content: '−'; }
+        .accordion p { font-size: 0.78rem; color: #666; line-height: 1.65; padding-bottom: 12px; }
+
+        /* Luxury Cart Item Styles - Overhauled for Responsiveness */
+        .cart-page { background: var(--paper); height: 100%; padding: 40px; display: flex; flex-direction: column; }
+        .cart-items-container { margin-top: 30px; display: flex; flex-direction: column; gap: 15px; flex: 1; overflow-y: auto; padding-right: 5px; }
+        .cart-item { display: flex; gap: 15px; padding: 15px; background: #fff; border: 1px solid var(--border); align-items: center; cursor: pointer; transition: all 0.2s; position: relative; width: 100%; }
+        .cart-item:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.05); border-color: var(--gold); }
+        .cart-item-img { width: 80px; height: 80px; background-size: contain; background-repeat: no-repeat; background-position: center; flex-shrink: 0; border: 1px solid #eee; background-color: #fff; }
+        .cart-item-info { flex: 1; min-width: 0; }
+        .cart-item-info h4 { font-family: 'Cinzel', serif; font-size: 0.85rem; color: #111; font-weight: normal; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .cart-item-info p { font-size: 0.8rem; color: var(--gold); margin-bottom: 10px; font-weight: bold; }
+        .cart-item-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+        .cart-btn { padding: 8px 15px; font-size: 0.6rem; font-family: sans-serif; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; border: 1px solid #ddd; background: transparent; transition: all 0.3s; flex: 1; min-width: 80px; text-align: center; }
+        .cart-btn.gold { border-color: var(--gold); color: var(--gold); }
+        .cart-btn:hover { background: var(--gold); color: #fff; border-color: var(--gold); }
+        .empty-msg { text-align: center; color: #999; font-style: italic; margin-top: 40px; font-family: 'Cormorant Garamond', serif; width: 100%; }
+
+        /* Luxury Product Popup */
+        .luxury-popup { position: fixed; inset: 0; background: rgba(0,0,0,0.9); display: none; z-index: 2000; justify-content: center; align-items: center; backdrop-filter: blur(10px); }
+        .luxury-popup-content { background: var(--paper); width: 90%; max-width: 850px; display: flex; position: relative; animation: luxuryFadeIn 0.5s cubic-bezier(0.2, 0, 0.2, 1); max-height: 90vh; overflow: hidden; }
+        @keyframes luxuryFadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+        .luxury-popup-img { flex: 1; background-size: contain; background-repeat: no-repeat; background-position: center; background-color: #fff; border-right: 1px solid var(--border); }
+        .luxury-popup-details { flex: 1; padding: 45px; overflow-y: auto; display: flex; flex-direction: column; }
+        .luxury-close { position: absolute; top: 20px; right: 20px; background: rgba(255,255,255,0.8); border: 1px solid var(--gold); color: var(--gold); font-size: 1.8rem; cursor: pointer; z-index: 20; line-height: 1; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 50%; transition: all 0.3s; }
+        .luxury-close:hover { background: var(--gold); color: #fff; }
+
+        .end-page { background: var(--paper); height: 100%; display: flex; align-items: center; justify-content: center; text-align: center; padding: 40px; overflow-y: auto; position: relative; }
+        .end-inner { width: 100%; max-width: 500px; }
+        .end-logo { width: 60px; margin-bottom: 30px; filter: grayscale(1) brightness(0.2); }
+        .end-message { font-family: 'Cormorant Garamond', serif; font-size: 1.2rem; font-style: italic; color: #444; line-height: 1.6; margin-top: 20px; }
+
+        .cover-page { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; height: 100%; position: relative; overflow: hidden; background: #080706; }
+        .cover-vignette { position: absolute; inset: 0; background: radial-gradient(ellipse 78% 72% at 50% 46%, transparent 0%, rgba(6,5,4,0.4) 50%, rgba(0,0,0,0.88) 100%); z-index: 2; pointer-events: none; }
+        .cover-page::before, .editorial-index::before, .end-page::before, .cart-page::before { content:''; position:absolute; top:0; left:0; width:24px; height:100%; background:linear-gradient(to right, #0a0806 0%, #3d2d14 38%, #2a1f0d 65%, #060503 100%); border-right:1px solid rgba(197,160,89,0.4); box-shadow:inset -2px 0 10px rgba(0,0,0,0.8), 2px 0 15px rgba(197,160,89,0.1); z-index:6; pointer-events:none; }
+        .cover-content { position:relative; z-index:10; display:flex; flex-direction:column; align-items:center; text-align:center; padding:0 52px; width:100%; }
+        .cover-logo-hero { width:80px; height:auto; margin-bottom:26px; filter:brightness(0) invert(1) sepia(1) saturate(0.4) brightness(1.1) drop-shadow(0 0 22px rgba(197,160,89,0.28)); }
+        .cov-ornament { display:flex; align-items:center; width:190px; margin:22px auto; }
+        .cov-ornament.narrow { width:130px; margin:18px auto; }
+        .cov-orn-line { flex:1; height:1px; background:linear-gradient(90deg,transparent,rgba(197,160,89,0.6)); }
+        .cov-orn-line.r { background:linear-gradient(90deg,rgba(197,160,89,0.6),transparent); }
+        .cov-orn-pip { width:5px; height:5px; border:1px solid rgba(197,160,89,0.78); transform:rotate(45deg); margin:0 10px; flex-shrink:0; }
+        .cov-t-blue { font-family:'Cormorant Garamond',serif; font-weight:300; font-size:clamp(2.2rem, 5vw, 3.5rem); letter-spacing:clamp(10px, 2vw, 18px); text-indent:18px; line-height:0.92; margin:0; color:#f0e8d8; }
+        .cov-t-diamond { font-family:'Cinzel',serif; font-weight:300; font-size:clamp(2.2rem, 5vw, 3.5rem); letter-spacing:clamp(10px, 2vw, 18px); text-indent:18px; line-height:1.15; margin:8px 0 0; background:linear-gradient(100deg,#8a6020 0%,#c8a060 18%,#f0d898 42%,#fce8a8 50%,#f0d898 58%,#c8a060 78%,#8a6020 100%); background-size:200% 100%; -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; animation:goldShimmer 5s ease-in-out infinite; }
+        @keyframes goldShimmer { 0%,100% { background-position:100% 0; } 50% { background-position:0% 0; } }
+        .cov-jewellery { font-family:sans-serif; font-size:0.7rem; letter-spacing:8px; color:var(--gold); margin-top:14px; opacity:0.8; font-weight:300; text-transform: uppercase; }
+        .cover-invite { position:absolute; bottom:8%; z-index:10; width:100%; display:flex; flex-direction:column; align-items:center; }
+        .cover-invite-line { display:flex; align-items:center; width:240px; margin-bottom:15px; }
+        .cover-invite-rule { flex:1; height:1px; background:linear-gradient(90deg,transparent,rgba(197,160,89,0.4)); }
+        .cover-invite-rule.right { background:linear-gradient(90deg,rgba(197,160,89,0.4),transparent); }
+        .cover-invite-line p { font-family:'Cormorant Garamond',serif; font-size:0.85rem; color:rgba(240,232,216,0.7); margin:0 15px; font-style:italic; }
+        .chevron-pair { display:flex; gap:8px; opacity:0.6; }
+        .cover-chevron { width:12px; height:12px; border-right:1px solid var(--gold); border-bottom:1px solid var(--gold); transform:rotate(-45deg); animation:chevronPulse 2s infinite; }
+        @keyframes chevronPulse { 0% { opacity:0.2; transform:translateX(-5px) rotate(-45deg); } 50% { opacity:1; transform:translateX(0) rotate(-45deg); } 100% { opacity:0.2; transform:translateX(5px) rotate(-45deg); } }
+
+        @media (min-width: 901px) {
+            .mobile-wrapper { display: none; }
+            .desktop-wrapper { width: 100vw; height: 100vh; display: flex; justify-content: center; align-items: center; background: #0a0a0a; overflow: hidden; }
+            .page { background: #fff; box-shadow: inset 0 0 50px rgba(0,0,0,0.05); height: 100%; }
+            .details-side { background: var(--paper); height: 100%; position: relative; }
+            .scrollable-content { height: 100%; overflow-y: auto; padding: 45px 55px; -webkit-overflow-scrolling: touch; }
+            .page-header-row { display: flex; justify-content: space-between; align-items: baseline; border-bottom: 1px solid var(--border); padding-bottom: 12px; margin-bottom: 25px; }
+            .page-counter { font-family: 'Cinzel', serif; font-size: 0.75rem; color: #bbb; letter-spacing: 1px; }
+            .page-counter em { font-style: normal; color: var(--gold); margin: 0 4px; }
+            .image-side { height: 100%; background-size: contain; background-repeat: no-repeat; background-position: center; background-color: #fff; position: relative; }
+            .price-container { font-size: 1.8rem; margin: 20px 0 18px; border-top: 1px solid #eee; padding-top: 16px; color: #000; }
+            .narrative-box label { display: block; font-size: 0.55rem; color: var(--gold); font-family: sans-serif; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 5px; }
+            .narrative-box p { font-size: 0.82rem; color: #555; line-height: 1.7; margin-bottom: 16px; }
+            .center-spine-shadow { position: absolute; left: 0; width: 40px; height: 100%; background: linear-gradient(to right, rgba(0,0,0,0.06), transparent); }
+        }
+
+        @media (max-width: 900px) {
+            .desktop-wrapper { display: none; }
+            .mobile-wrapper { width: 100vw; height: 100vh; display: flex; justify-content: center; align-items: center; background: #0a0a0a; overflow: hidden; position: relative; }
+            #mobile-flipbook { flex-shrink: 0; filter: drop-shadow(-6px 0 20px rgba(197,160,89,0.10)) drop-shadow(6px 0 20px rgba(197,160,89,0.07)); }
+            .mobile-single-page { background: #fff; overflow: visible; }
+            .mobile-page-wrap { display: flex; flex-direction: column; width: 100%; height: 100%; overflow: hidden; }
+            .mobile-img-panel { flex: 0 0 38%; background-size: contain; background-repeat: no-repeat; background-position: center; background-color: #fff; position: relative; border-bottom: 1px solid var(--border); }
+            .mobile-pnum { position: absolute; bottom: 10px; right: 14px; font-family: sans-serif; font-size: 0.9rem; color: #bbb; letter-spacing: 1px; line-height: 1; }
+            .mobile-pnum span { font-size: 0.48rem; letter-spacing: 2px; color: #ccc; }
+            .mobile-info-panel { flex: 1; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; touch-action: pan-y; padding: 18px 22px; padding-bottom: max(80px, calc(env(safe-area-inset-bottom, 0px) + 64px)); background: var(--paper); }
+            .price-display { font-size: 1.3rem; color: #111; margin-bottom: 16px; }
+            .slide-actions { margin-top: 18px; border-top: 1px solid var(--border); padding-top: 16px; display: flex; flex-direction: column; gap: 8px; }
+            .mobile-nav-btn { position: fixed; top: 28%; transform: translateY(-50%); z-index: 200; width: 60px; height: 54px; background: rgba(10,10,10,0.45); border: 1px solid rgba(197,160,89,0.35); color: rgba(197,160,89,0.9); font-size: 1.5rem; display: flex; align-items: center; justify-content: center; cursor: pointer; backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); transition: background 0.2s; touch-action: none; }
+            .mobile-nav-btn.prev { left: 0; border-left: none; border-radius: 0 4px 4px 0; }
+            .mobile-nav-btn.next { right: 0; border-right: none; border-radius: 4px 0 0 4px; }
+            body.on-cover .mobile-nav-btn.prev { opacity: 0; pointer-events: none; }
+            
+            .luxury-popup-content { flex-direction: column; width: 95%; }
+            .luxury-popup-img { height: 280px; flex: none; border-right: none; border-bottom: 1px solid var(--border); }
+            .luxury-popup-details { padding: 25px; }
+            .cart-item-actions { flex-direction: row; }
+            .cart-btn { padding: 10px 5px; font-size: 0.55rem; min-width: 70px; }
+        }
+
+        .custom-modal { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.85); display: none; justify-content: center; align-items: center; z-index: 3000; backdrop-filter: blur(8px); cursor: pointer; }
+        .modal-content { background: var(--paper); padding: 30px; text-align: center; border: 1px solid var(--gold); max-width: 90%; width: 450px; max-height: 90vh; overflow-y: auto; position: relative; cursor: default; }
+        .modal-x-close { position: absolute; top: 12px; right: 14px; background: none; border: none; color: var(--gold); font-size: 1.3rem; cursor: pointer; line-height: 1; padding: 4px 6px; opacity: 0.8; transition: opacity 0.2s; z-index: 10; }
+        .modal-x-close:hover { opacity: 1; }
+        .modal-content h3 { font-family: 'Cinzel', serif; color: var(--gold); margin-bottom: 10px; letter-spacing: 2px; font-size: 1.2rem; }
+        .modal-content p { font-family: sans-serif; font-size: 0.75rem; color: #555; margin-bottom: 20px; line-height: 1.6; }
+        .modal-close { background: var(--black); color: #fff; border: none; padding: 10px 25px; font-family: sans-serif; font-size: 0.6rem; letter-spacing: 2px; text-transform: uppercase; cursor: pointer; }
+
+        .smart-form { display: flex; flex-direction: column; gap: 12px; text-align: left; }
+        .form-group { display: flex; flex-direction: column; gap: 4px; }
+        .form-group label { font-family: sans-serif; font-size: 0.6rem; color: var(--gold); text-transform: uppercase; letter-spacing: 1px; }
+        .form-group input, .form-group select { padding: 10px; border: 1px solid var(--border); background: #fff; font-family: sans-serif; font-size: 0.8rem; outline: none; }
+        .form-group input:focus { border-color: var(--gold); }
+        .phone-input-container { display: flex; gap: 5px; }
+        .phone-input-container select { flex: 0 0 90px; font-size: 0.7rem; }
+        .phone-input-container input { flex: 1; }
+        .brand-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 5px; }
+        .brand-option { display: flex; align-items: center; gap: 8px; font-size: 0.7rem; font-family: sans-serif; color: #444; cursor: pointer; }
+        .brand-option input { width: 14px; height: 14px; cursor: pointer; }
+        .form-submit { margin-top: 10px; background: var(--black); color: #fff; border: none; padding: 14px; font-family: sans-serif; font-size: 0.7rem; letter-spacing: 2px; text-transform: uppercase; cursor: pointer; transition: background 0.3s; }
+        .form-submit:hover { background: var(--gold); }
+        .optional-tag { font-size: 0.55rem; color: #999; text-transform: none; letter-spacing: 0; margin-left: 5px; }
+        #customCountryCodeRow { display: none; margin-top: 5px; }
+    </style>
+</head>
+<body>
+
+    <div id="loading-screen">
+        <div class="loading-vignette"></div>
+        <div class="loading-content">
+            <div class="loading-text">Blue Diamond Jewellery</div>
+            <div class="loading-bar-container">
+                <div class="loading-bar"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="desktop-wrapper">
+        <div id="flipbook">
+            <div class="page" data-density="hard">
+                <div class="page-content cover-page">
+                    
+    <div class="cover-page">
+        <div class="cover-vignette"></div>
+        <div class="cover-content">
+            <img src="https://res.cloudinary.com/daucolvng/image/upload/f_auto,q_auto/BD_Logo_d4gza1" alt="Blue Diamond" class="cover-logo-hero" />
+            <div class="cov-ornament">
+                <div class="cov-orn-line"></div>
+                <div class="cov-orn-pip"></div>
+                <div class="cov-orn-line r"></div>
+            </div>
+            <h1 class="cov-t-blue">BLUE</h1>
+            <h1 class="cov-t-diamond">DIAMOND</h1>
+            <div class="cov-ornament narrow">
+                <div class="cov-orn-line"></div>
+                <div class="cov-orn-pip"></div>
+                <div class="cov-orn-line r"></div>
+            </div>
+            <p class="cov-jewellery">J E W E L L E R Y</p>
+        </div>
+        <div class="cover-invite">
+            <div class="cover-invite-line">
+                <div class="cover-invite-rule"></div>
+                <p>مرّر لاستكشاف المجموعة</p>
+                <div class="cover-invite-rule right"></div>
+            </div>
+            <div class="chevron-pair"><div class="cover-chevron horizontal"></div><div class="cover-chevron horizontal"></div></div>
+        </div>
+    </div>
+                </div>
+            </div>
+            
+        <div class="page" data-density="soft">
+            <div class="page-content details-side">
+                <div class="inner scrollable-content">
+                    <div class="page-header-row">
+                        <span class="exquisite-label">المجموعة الفاخرة</span>
+                        <span class="page-counter">01 <em>/</em> 12</span>
+                    </div>
+                    <h2 class="product-title">قلادة جيو ماتريكا كوشن موبي كبيرة</h2>
+                    <p class="product-ref">المرجع: PN-3065</p>
+                    <div class="gold-accent-line"></div>
+                    <div class="narrative-box">
+                        <label>القطعة</label>
+                        <p>قلادة جيو ماتريكا كوشن موبي الكبيرة مصممة من الذهب عيار 18KP، بوزن 34.46 جرام. مصنوعة بعناية دقيقة، تعكس شخصية وبنية وفردية مميزة—مثالية لهواة الجمع وعشاق الأشكال الراقية.</p>
+                        <label>التفاصيل</label>
+                        <p>وزن الذهب: 34.46 جرام<br>الماس (قيراط): RD 2.59 CT، VS-G. MP/MN 11.50 CT<br>لون الذهب: وردي<br>قابلة لتغيير الحجم: نعم<br>صنع في: إيطاليا</p>
+                    </div>
+                    <div class="price-container">ر.ق ٥٢٦٣٠</div>
+                    <div class="button-group">
+                        <button onclick="handleAction('Add to Bag', 'PN-3065', 'قلادة جيو ماتريكا كوشن موبي كبيرة', 'Bijouq')" class="btn btn-primary">أضف إلى الحقيبة</button>
+                        <div class="secondary-btns">
+                            <button onclick="handleAction('Advisor', 'PN-3065', 'قلادة جيو ماتريكا كوشن موبي كبيرة', 'Bijouq')" class="btn btn-secondary">تحدث مع مستشار</button>
+                            <button onclick="handleAction('Buy Now', 'PN-3065', 'قلادة جيو ماتريكا كوشن موبي كبيرة', 'Bijouq')" class="btn btn-secondary">اشترِ الآن</button>
+                        </div>
+                        <div class="view-cart-link" onclick="pf.flip(27)">عرض المنتجات في السلة</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="page" data-density="soft">
+            <div class="page-content image-side" style="background-image: url('https://cdn.shopify.com/s/files/1/0707/3991/9016/files/PN-3065_12071c3e-f0ed-42ab-8716-6d5928c9a13a.jpg?v=1771780708')">
+                <div class="vendor-overlay-box">Bijouq</div>
+                <div class="center-spine-shadow"></div>
+            </div>
+        </div>
+    
+        <div class="page" data-density="soft">
+            <div class="page-content details-side">
+                <div class="inner scrollable-content">
+                    <div class="page-header-row">
+                        <span class="exquisite-label">المجموعة الفاخرة</span>
+                        <span class="page-counter">02 <em>/</em> 12</span>
+                    </div>
+                    <h2 class="product-title">أقراط إيدينيا الماسية</h2>
+                    <p class="product-ref">المرجع: ER-5888</p>
+                    <div class="gold-accent-line"></div>
+                    <div class="narrative-box">
+                        <label>القطعة</label>
+                        <p>أقراط إيدينيا الماسية، مصممة من الذهب عيار 18 نقطة قيراط (18KP)، بوزن 18.43 جرام. صُنعت بعناية فائقة لتعكس الشخصية والبنية والتفرد—مثالية لهواة الجمع والمعجبين بالأشكال الراقية.</p>
+                        <label>التفاصيل</label>
+                        <p>وزن الذهب: 18.43 جرام<br>الماس (قيراط): RD 2.76 CT، VS-G. MQ 0.47 CT، VS-G. PE 1.32 CT، VS-G<br>لون الذهب: وردي<br>قابلة لتعديل المقاس: نعم<br>صُنع في: إيطاليا<br>يرجى ملاحظة أن أوصاف المنتجات قد تختلف قليلاً حسب الحجم وتفاوت الصنعة.</p>
+                    </div>
+                    <div class="price-container">ر.ق ٥٠٨٥٠</div>
+                    <div class="button-group">
+                        <button onclick="handleAction('Add to Bag', 'ER-5888', 'أقراط إيدينيا الماسية', 'Bijouq')" class="btn btn-primary">أضف إلى الحقيبة</button>
+                        <div class="secondary-btns">
+                            <button onclick="handleAction('Advisor', 'ER-5888', 'أقراط إيدينيا الماسية', 'Bijouq')" class="btn btn-secondary">تحدث مع مستشار</button>
+                            <button onclick="handleAction('Buy Now', 'ER-5888', 'أقراط إيدينيا الماسية', 'Bijouq')" class="btn btn-secondary">اشترِ الآن</button>
+                        </div>
+                        <div class="view-cart-link" onclick="pf.flip(27)">عرض المنتجات في السلة</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="page" data-density="soft">
+            <div class="page-content image-side" style="background-image: url('https://cdn.shopify.com/s/files/1/0707/3991/9016/files/ER-5888_b0ef16ad-1e6f-4a3d-8775-68d6623c3a83.jpg?v=1771780691')">
+                <div class="vendor-overlay-box">Bijouq</div>
+                <div class="center-spine-shadow"></div>
+            </div>
+        </div>
+    
+        <div class="page" data-density="soft">
+            <div class="page-content details-side">
+                <div class="inner scrollable-content">
+                    <div class="page-header-row">
+                        <span class="exquisite-label">المجموعة الفاخرة</span>
+                        <span class="page-counter">03 <em>/</em> 12</span>
+                    </div>
+                    <h2 class="product-title">عقد مسألة ضوء مع لؤلؤ - كبير</h2>
+                    <p class="product-ref">المرجع: NK-2510</p>
+                    <div class="gold-accent-line"></div>
+                    <div class="narrative-box">
+                        <label>القطعة</label>
+                        <p>تحية للأناقة، حيث يرقص الضوء على الذهب.</p>
+                        <label>التفاصيل</label>
+                        <p>وزن الذهب: 23.37 ج<br>الماس (قيراط): R RD 2.96 قيراط، VVS-G. PRS 3.44 قيراط<br>لون الذهب: وردي<br>قابل للتعديل: لا<br>صنع في: إيطاليا</p>
+                    </div>
+                    <div class="price-container">ر.ق ١٤٩٣١</div>
+                    <div class="button-group">
+                        <button onclick="handleAction('Add to Bag', 'NK-2510', 'عقد مسألة ضوء مع لؤلؤ - كبير', 'Luca Carati')" class="btn btn-primary">أضف إلى الحقيبة</button>
+                        <div class="secondary-btns">
+                            <button onclick="handleAction('Advisor', 'NK-2510', 'عقد مسألة ضوء مع لؤلؤ - كبير', 'Luca Carati')" class="btn btn-secondary">تحدث مع مستشار</button>
+                            <button onclick="handleAction('Buy Now', 'NK-2510', 'عقد مسألة ضوء مع لؤلؤ - كبير', 'Luca Carati')" class="btn btn-secondary">اشترِ الآن</button>
+                        </div>
+                        <div class="view-cart-link" onclick="pf.flip(27)">عرض المنتجات في السلة</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="page" data-density="soft">
+            <div class="page-content image-side" style="background-image: url('https://cdn.shopify.com/s/files/1/0707/3991/9016/files/NK-2510_1a70fbad-2fb3-417c-8a1a-1aa8f5572850.jpg?v=1771778839')">
+                <div class="vendor-overlay-box">Luca Carati</div>
+                <div class="center-spine-shadow"></div>
+            </div>
+        </div>
+    
+        <div class="page" data-density="soft">
+            <div class="page-content details-side">
+                <div class="inner scrollable-content">
+                    <div class="page-header-row">
+                        <span class="exquisite-label">المجموعة الفاخرة</span>
+                        <span class="page-counter">04 <em>/</em> 12</span>
+                    </div>
+                    <h2 class="product-title">سوار موجة من الذهب عيار 18 قيراط</h2>
+                    <p class="product-ref">المرجع: BR-2388</p>
+                    <div class="gold-accent-line"></div>
+                    <div class="narrative-box">
+                        <label>القطعة</label>
+                        <p>سوار موجة نحتية من الذهب الأصفر عيار 18 قيراط مع 1.5 قيراط من الألماس بدرجة نقاء VS-G.</p>
+                        <label>التفاصيل</label>
+                        <p>وزن الذهب: 32.10 جرام<br>الألماس (قيراط): RD 1.5 قيراط، VS-G<br>لون الذهب: أصفر<br>قابل للتعديل: لا<br>صُنع في: إيطاليا</p>
+                    </div>
+                    <div class="price-container">ر.ق ٤٦١١٦</div>
+                    <div class="button-group">
+                        <button onclick="handleAction('Add to Bag', 'BR-2388', 'سوار موجة من الذهب عيار 18 قيراط', 'J Jewels')" class="btn btn-primary">أضف إلى الحقيبة</button>
+                        <div class="secondary-btns">
+                            <button onclick="handleAction('Advisor', 'BR-2388', 'سوار موجة من الذهب عيار 18 قيراط', 'J Jewels')" class="btn btn-secondary">تحدث مع مستشار</button>
+                            <button onclick="handleAction('Buy Now', 'BR-2388', 'سوار موجة من الذهب عيار 18 قيراط', 'J Jewels')" class="btn btn-secondary">اشترِ الآن</button>
+                        </div>
+                        <div class="view-cart-link" onclick="pf.flip(27)">عرض المنتجات في السلة</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="page" data-density="soft">
+            <div class="page-content image-side" style="background-image: url('https://cdn.shopify.com/s/files/1/0707/3991/9016/files/BR-2388_67ea1770-18cf-4a50-aae2-3a0579f69c28.png?v=1763448613')">
+                <div class="vendor-overlay-box">J Jewels</div>
+                <div class="center-spine-shadow"></div>
+            </div>
+        </div>
+    
+        <div class="page" data-density="soft">
+            <div class="page-content details-side">
+                <div class="inner scrollable-content">
+                    <div class="page-header-row">
+                        <span class="exquisite-label">المجموعة الفاخرة</span>
+                        <span class="page-counter">05 <em>/</em> 12</span>
+                    </div>
+                    <h2 class="product-title">سوار صوفيا الأنيق من الذهب عيار 18</h2>
+                    <p class="product-ref">المرجع: BR-2390</p>
+                    <div class="gold-accent-line"></div>
+                    <div class="narrative-box">
+                        <label>القطعة</label>
+                        <p>سوار صوفيا الأنيق من الذهب الأبيض عيار 18 قيراط مزين بـ 3.05 قيراط من الماس بدرجة نقاء VS-G.</p>
+                        <label>التفاصيل</label>
+                        <p>وزن الذهب: 27.90 جم<br>الماس (قيراط): RD 3.05 قيراط, VS-G<br>لون الذهب: أبيض<br>قابل لتعديل الحجم: لا<br>صُنع في: إيطاليا</p>
+                    </div>
+                    <div class="price-container">ر.ق ٤٧٣٤٨</div>
+                    <div class="button-group">
+                        <button onclick="handleAction('Add to Bag', 'BR-2390', 'سوار صوفيا الأنيق من الذهب عيار 18', 'J Jewels')" class="btn btn-primary">أضف إلى الحقيبة</button>
+                        <div class="secondary-btns">
+                            <button onclick="handleAction('Advisor', 'BR-2390', 'سوار صوفيا الأنيق من الذهب عيار 18', 'J Jewels')" class="btn btn-secondary">تحدث مع مستشار</button>
+                            <button onclick="handleAction('Buy Now', 'BR-2390', 'سوار صوفيا الأنيق من الذهب عيار 18', 'J Jewels')" class="btn btn-secondary">اشترِ الآن</button>
+                        </div>
+                        <div class="view-cart-link" onclick="pf.flip(27)">عرض المنتجات في السلة</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="page" data-density="soft">
+            <div class="page-content image-side" style="background-image: url('https://cdn.shopify.com/s/files/1/0707/3991/9016/files/BR-2390_5d8ede45-acb0-4938-b9e2-8d179f25d275.png?v=1763448605')">
+                <div class="vendor-overlay-box">J Jewels</div>
+                <div class="center-spine-shadow"></div>
+            </div>
+        </div>
+    
+        <div class="page" data-density="soft">
+            <div class="page-content details-side">
+                <div class="inner scrollable-content">
+                    <div class="page-header-row">
+                        <span class="exquisite-label">المجموعة الفاخرة</span>
+                        <span class="page-counter">06 <em>/</em> 12</span>
+                    </div>
+                    <h2 class="product-title">قلادة دقيقة من الذهب عيار 18 قيراط على شكل ورقة</h2>
+                    <p class="product-ref">المرجع: NK-3940</p>
+                    <div class="gold-accent-line"></div>
+                    <div class="narrative-box">
+                        <label>القطعة</label>
+                        <p>قلادة دقيقة من الذهب الأبيض عيار 18 قيراط على شكل ورقة مزينة بألماس يزن 2.41 قيراط وأحجار ياقوت وردي تزن 1 قيراط.</p>
+                        <label>التفاصيل</label>
+                        <p>وزن الذهب: 23.50 جرام<br>ألماس (قيراط): RD 2.41 قيراط، VS-G<br>لون الذهب: أبيض<br>قابلة للتعديل: لا<br>صُنع في: إيطاليا</p>
+                    </div>
+                    <div class="price-container">ر.ق ٤٥٢٤٨.٥</div>
+                    <div class="button-group">
+                        <button onclick="handleAction('Add to Bag', 'NK-3940', 'قلادة دقيقة من الذهب عيار 18 قيراط على شكل ورقة', 'J Jewels')" class="btn btn-primary">أضف إلى الحقيبة</button>
+                        <div class="secondary-btns">
+                            <button onclick="handleAction('Advisor', 'NK-3940', 'قلادة دقيقة من الذهب عيار 18 قيراط على شكل ورقة', 'J Jewels')" class="btn btn-secondary">تحدث مع مستشار</button>
+                            <button onclick="handleAction('Buy Now', 'NK-3940', 'قلادة دقيقة من الذهب عيار 18 قيراط على شكل ورقة', 'J Jewels')" class="btn btn-secondary">اشترِ الآن</button>
+                        </div>
+                        <div class="view-cart-link" onclick="pf.flip(27)">عرض المنتجات في السلة</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="page" data-density="soft">
+            <div class="page-content image-side" style="background-image: url('https://cdn.shopify.com/s/files/1/0707/3991/9016/files/NK-3940_d3da2f96-0b82-424b-8b0f-ef53af9c13ae.png?v=1763448601')">
+                <div class="vendor-overlay-box">J Jewels</div>
+                <div class="center-spine-shadow"></div>
+            </div>
+        </div>
+    
+        <div class="page" data-density="soft">
+            <div class="page-content details-side">
+                <div class="inner scrollable-content">
+                    <div class="page-header-row">
+                        <span class="exquisite-label">المجموعة الفاخرة</span>
+                        <span class="page-counter">07 <em>/</em> 12</span>
+                    </div>
+                    <h2 class="product-title">أقراط شاين تشارم مع الماس</h2>
+                    <p class="product-ref">المرجع: ER-3726</p>
+                    <div class="gold-accent-line"></div>
+                    <div class="narrative-box">
+                        <label>القطعة</label>
+                        <p>أقراط من الذهب الأبيض عيار 18 قيراط مع ماس على شكل كمثرى ودائري بدرجة نقاء VS-G لتألق مشع.</p>
+                        <label>التفاصيل</label>
+                        <p>وزن الذهب: 10.78 غ<br>الماسة (قيراط): كمثرى 3.84 قيراط، VS-G. دائري 1.5 قيراط، VS-G<br>لون الذهب: أبيض<br>قابل للتعديل: لا<br>صُنع في: إيطاليا</p>
+                    </div>
+                    <div class="price-container">ر.ق ٥٣٠٠١</div>
+                    <div class="button-group">
+                        <button onclick="handleAction('Add to Bag', 'ER-3726', 'أقراط شاين تشارم مع الماس', 'Cashmere')" class="btn btn-primary">أضف إلى الحقيبة</button>
+                        <div class="secondary-btns">
+                            <button onclick="handleAction('Advisor', 'ER-3726', 'أقراط شاين تشارم مع الماس', 'Cashmere')" class="btn btn-secondary">تحدث مع مستشار</button>
+                            <button onclick="handleAction('Buy Now', 'ER-3726', 'أقراط شاين تشارم مع الماس', 'Cashmere')" class="btn btn-secondary">اشترِ الآن</button>
+                        </div>
+                        <div class="view-cart-link" onclick="pf.flip(27)">عرض المنتجات في السلة</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="page" data-density="soft">
+            <div class="page-content image-side" style="background-image: url('https://cdn.shopify.com/s/files/1/0707/3991/9016/files/ER-3726_9bf19386-7330-4d80-87c2-933f650501e9.png?v=1762088956')">
+                <div class="vendor-overlay-box">Cashmere</div>
+                <div class="center-spine-shadow"></div>
+            </div>
+        </div>
+    
+        <div class="page" data-density="soft">
+            <div class="page-content details-side">
+                <div class="inner scrollable-content">
+                    <div class="page-header-row">
+                        <span class="exquisite-label">المجموعة الفاخرة</span>
+                        <span class="page-counter">08 <em>/</em> 12</span>
+                    </div>
+                    <h2 class="product-title">سوار سيرس اليومي من الذهب عيار 18</h2>
+                    <p class="product-ref">المرجع: BR-2394</p>
+                    <div class="gold-accent-line"></div>
+                    <div class="narrative-box">
+                        <label>القطعة</label>
+                        <p>سوار سيرس مصنوع من الذهب الأصفر عيار 18 مزين بألماس بدرجة وضوح VS-G ووزن 1.6 قيراط لإطلالة أنيقة يومية.</p>
+                        <label>التفاصيل</label>
+                        <p>وزن الذهب: 32.90 جرام<br>الألماس (قيراط): RD 1.6 CT، VS-G<br>لون الذهب: أصفر<br>قابل لتعديل الحجم: لا<br>صُنع في: إيطاليا</p>
+                    </div>
+                    <div class="price-container">ر.ق ٤٥٣٧٢</div>
+                    <div class="button-group">
+                        <button onclick="handleAction('Add to Bag', 'BR-2394', 'سوار سيرس اليومي من الذهب عيار 18', 'J Jewels')" class="btn btn-primary">أضف إلى الحقيبة</button>
+                        <div class="secondary-btns">
+                            <button onclick="handleAction('Advisor', 'BR-2394', 'سوار سيرس اليومي من الذهب عيار 18', 'J Jewels')" class="btn btn-secondary">تحدث مع مستشار</button>
+                            <button onclick="handleAction('Buy Now', 'BR-2394', 'سوار سيرس اليومي من الذهب عيار 18', 'J Jewels')" class="btn btn-secondary">اشترِ الآن</button>
+                        </div>
+                        <div class="view-cart-link" onclick="pf.flip(27)">عرض المنتجات في السلة</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="page" data-density="soft">
+            <div class="page-content image-side" style="background-image: url('https://cdn.shopify.com/s/files/1/0707/3991/9016/files/BR-2394_ff1cbb23-bcf3-4035-8b31-e7a2c67fe968.png?v=1763448580')">
+                <div class="vendor-overlay-box">J Jewels</div>
+                <div class="center-spine-shadow"></div>
+            </div>
+        </div>
+    
+        <div class="page" data-density="soft">
+            <div class="page-content details-side">
+                <div class="inner scrollable-content">
+                    <div class="page-header-row">
+                        <span class="exquisite-label">المجموعة الفاخرة</span>
+                        <span class="page-counter">09 <em>/</em> 12</span>
+                    </div>
+                    <h2 class="product-title">سوار أبراسيو الفاخر عيار 18 قيراط</h2>
+                    <p class="product-ref">المرجع: BR-2392</p>
+                    <div class="gold-accent-line"></div>
+                    <div class="narrative-box">
+                        <label>القطعة</label>
+                        <p>سوار أبراسيو الفاخر من الذهب الأصفر عيار 18 قيراط، مزين بألماس وزنه 5.12 قيراط بدرجة نقاء VS-G.</p>
+                        <label>التفاصيل</label>
+                        <p>وزن الذهب: 26.70 جرام<br>الماس (قيراط): RD 5.12 CT, VS-G<br>لون الذهب: أصفر<br>قابلية التعديل: لا<br>صُنع في: إيطاليا<br><br>يرجى ملاحظة أن وصف المنتج قد يختلف قليلاً حسب حجم وتصنيع القطعة.</p>
+                    </div>
+                    <div class="price-container">ر.ق ٥٠٨١٥.٥</div>
+                    <div class="button-group">
+                        <button onclick="handleAction('Add to Bag', 'BR-2392', 'سوار أبراسيو الفاخر عيار 18 قيراط', 'J Jewels')" class="btn btn-primary">أضف إلى الحقيبة</button>
+                        <div class="secondary-btns">
+                            <button onclick="handleAction('Advisor', 'BR-2392', 'سوار أبراسيو الفاخر عيار 18 قيراط', 'J Jewels')" class="btn btn-secondary">تحدث مع مستشار</button>
+                            <button onclick="handleAction('Buy Now', 'BR-2392', 'سوار أبراسيو الفاخر عيار 18 قيراط', 'J Jewels')" class="btn btn-secondary">اشترِ الآن</button>
+                        </div>
+                        <div class="view-cart-link" onclick="pf.flip(27)">عرض المنتجات في السلة</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="page" data-density="soft">
+            <div class="page-content image-side" style="background-image: url('https://cdn.shopify.com/s/files/1/0707/3991/9016/files/BR-2392_357b57e1-5d4d-4f84-858a-f2bb1b7be060.png?v=1763448565')">
+                <div class="vendor-overlay-box">J Jewels</div>
+                <div class="center-spine-shadow"></div>
+            </div>
+        </div>
+    
+        <div class="page" data-density="soft">
+            <div class="page-content details-side">
+                <div class="inner scrollable-content">
+                    <div class="page-header-row">
+                        <span class="exquisite-label">المجموعة الفاخرة</span>
+                        <span class="page-counter">10 <em>/</em> 12</span>
+                    </div>
+                    <h2 class="product-title">أقراط إيدينيا دياموندز، الذهب الأبيض</h2>
+                    <p class="product-ref">المرجع: ER-5649</p>
+                    <div class="gold-accent-line"></div>
+                    <div class="narrative-box">
+                        <label>القطعة</label>
+                        <p>أقراط إيدينيا دياموندز مصممة من ذهب عيار 18KW، بوزن 15.6 جرام. مصنوعة بعناية فائقة، تعكس الشخصية، البنية، والفردية—مثالية لهواة الجمع وعشاق الأشكال الراقية.</p>
+                        <label>التفاصيل</label>
+                        <p>وزن الذهب: 15.6 جرام<br>الألماس (قيراط): RD 2.8 CT، VS-G. MQ 0.45 CT، VS-G. PE 1.39 CT، VS-G<br>لون الذهب: وردي<br>قابل للتعديل: نعم<br>صنع في: إيطاليا</p>
+                    </div>
+                    <div class="price-container">ر.ق ٤٨٣٠٨</div>
+                    <div class="button-group">
+                        <button onclick="handleAction('Add to Bag', 'ER-5649', 'أقراط إيدينيا دياموندز، الذهب الأبيض', 'Bijouq')" class="btn btn-primary">أضف إلى الحقيبة</button>
+                        <div class="secondary-btns">
+                            <button onclick="handleAction('Advisor', 'ER-5649', 'أقراط إيدينيا دياموندز، الذهب الأبيض', 'Bijouq')" class="btn btn-secondary">تحدث مع مستشار</button>
+                            <button onclick="handleAction('Buy Now', 'ER-5649', 'أقراط إيدينيا دياموندز، الذهب الأبيض', 'Bijouq')" class="btn btn-secondary">اشترِ الآن</button>
+                        </div>
+                        <div class="view-cart-link" onclick="pf.flip(27)">عرض المنتجات في السلة</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="page" data-density="soft">
+            <div class="page-content image-side" style="background-image: url('https://cdn.shopify.com/s/files/1/0707/3991/9016/files/ER-5649_8b54185c-012b-4f4b-a82b-3812a1e090c6.jpg?v=1756912972')">
+                <div class="vendor-overlay-box">Bijouq</div>
+                <div class="center-spine-shadow"></div>
+            </div>
+        </div>
+    
+        <div class="page" data-density="soft">
+            <div class="page-content details-side">
+                <div class="inner scrollable-content">
+                    <div class="page-header-row">
+                        <span class="exquisite-label">المجموعة الفاخرة</span>
+                        <span class="page-counter">11 <em>/</em> 12</span>
+                    </div>
+                    <h2 class="product-title">عقد آرت ديكو</h2>
+                    <p class="product-ref">المرجع: NK-2579</p>
+                    <div class="gold-accent-line"></div>
+                    <div class="narrative-box">
+                        <label>القطعة</label>
+                        <p>تحية للأناقة، حيث يرقص الضوء على الذهب.</p>
+                        <label>التفاصيل</label>
+                        <p>وزن الذهب: 20.24 غرام<br>الماس (القيراط): RD 3.31CT، VVS-G.<br>لون الذهب: وردي<br>قابل لتغيير الحجم: لا<br>صُنع في: إيطاليا<br><br>يرجى ملاحظة أن وصف المنتج قد يختلف قليلاً حسب حجم القطعة وتفاوتات الصنعة.</p>
+                    </div>
+                    <div class="price-container">ر.ق ٤٦٦٢٠</div>
+                    <div class="button-group">
+                        <button onclick="handleAction('Add to Bag', 'NK-2579', 'عقد آرت ديكو', 'Luca Carati')" class="btn btn-primary">أضف إلى الحقيبة</button>
+                        <div class="secondary-btns">
+                            <button onclick="handleAction('Advisor', 'NK-2579', 'عقد آرت ديكو', 'Luca Carati')" class="btn btn-secondary">تحدث مع مستشار</button>
+                            <button onclick="handleAction('Buy Now', 'NK-2579', 'عقد آرت ديكو', 'Luca Carati')" class="btn btn-secondary">اشترِ الآن</button>
+                        </div>
+                        <div class="view-cart-link" onclick="pf.flip(27)">عرض المنتجات في السلة</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="page" data-density="soft">
+            <div class="page-content image-side" style="background-image: url('https://cdn.shopify.com/s/files/1/0707/3991/9016/files/NK-2579_03df9727-ef9c-407e-9c35-9e4b62153312.jpg?v=1754897837')">
+                <div class="vendor-overlay-box">Luca Carati</div>
+                <div class="center-spine-shadow"></div>
+            </div>
+        </div>
+    
+        <div class="page" data-density="soft">
+            <div class="page-content details-side">
+                <div class="inner scrollable-content">
+                    <div class="page-header-row">
+                        <span class="exquisite-label">المجموعة الفاخرة</span>
+                        <span class="page-counter">12 <em>/</em> 12</span>
+                    </div>
+                    <h2 class="product-title">قلادة جيوماتريكا الوسادة الياقوت الوردي، كبيرة</h2>
+                    <p class="product-ref">المرجع: PN-2865</p>
+                    <div class="gold-accent-line"></div>
+                    <div class="narrative-box">
+                        <label>القطعة</label>
+                        <p>قلادة جيوماتريكا الوسادة الياقوت الوردي الكبيرة مصممة من الذهب عيار 18KP، بوزن 35.16 جرام. مصنوعة بعناية دقيقة، تعكس الشخصية، والبنية، والفردية — مثالية لهواة الجمع وعشاق الأشكال الراقية.</p>
+                        <label>التفاصيل</label>
+                        <p>وزن الذهب: 35.16 جرام<br>الماس (قيراط): RD 2.45 CT، VS-G. PRS 2.75 CT. MP/MN 0.30 CT<br>لون الذهب: وردي<br>قابلة لتعديل الحجم: نعم<br>صُنعت في: إيطاليا</p>
+                    </div>
+                    <div class="price-container">ر.ق ٤٧٥٠٠</div>
+                    <div class="button-group">
+                        <button onclick="handleAction('Add to Bag', 'PN-2865', 'قلادة جيوماتريكا الوسادة الياقوت الوردي، كبيرة', 'Bijouq')" class="btn btn-primary">أضف إلى الحقيبة</button>
+                        <div class="secondary-btns">
+                            <button onclick="handleAction('Advisor', 'PN-2865', 'قلادة جيوماتريكا الوسادة الياقوت الوردي، كبيرة', 'Bijouq')" class="btn btn-secondary">تحدث مع مستشار</button>
+                            <button onclick="handleAction('Buy Now', 'PN-2865', 'قلادة جيوماتريكا الوسادة الياقوت الوردي، كبيرة', 'Bijouq')" class="btn btn-secondary">اشترِ الآن</button>
+                        </div>
+                        <div class="view-cart-link" onclick="pf.flip(27)">عرض المنتجات في السلة</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="page" data-density="soft">
+            <div class="page-content image-side" style="background-image: url('https://cdn.shopify.com/s/files/1/0707/3991/9016/files/PN-2865.jpg?v=1751271565')">
+                <div class="vendor-overlay-box">Bijouq</div>
+                <div class="center-spine-shadow"></div>
+            </div>
+        </div>
+    
+    <div class="page" data-density="hard">
+        <div class="page-content cart-page">
+            <div class="inner scrollable-content">
+                <div class="chapter-label">إختياراتك</div>
+                <h2 class="chapter-title">حقيبة التسوّق الخاصة بي</h2>
+                <div class="gold-accent-line centered"></div>
+                <div id="cart-container-desktop" class="cart-items-container">
+                    <!-- Dynamic Cart Items -->
+                </div>
+                <button onclick="pf.flip(1)" class="btn btn-secondary" style="margin-top:20px;">مواصلة الاستكشاف</button>
+            </div>
+        </div>
+    </div>
+    <div class="page" data-density="hard">
+        <div class="page-content end-page">
+            <div class="end-inner">
+                <img src="https://res.cloudinary.com/daucolvng/image/upload/f_auto,q_auto/BD_Logo_d4gza1" class="end-logo" alt="BD Logo">
+                <h2 class="chapter-title">النهاية</h2>
+                <div class="gold-accent-line centered"></div>
+                <p class="end-message">نشكرك على استكشاف مجموعاتنا. ندعوك للتواصل مع مستشارينا للحصول على تجربة مخصصة تليق بك.</p>
+                <button onclick="pf.flip(1)" class="btn btn-primary" style="margin-top:30px; width:auto; padding: 15px 40px;">Return to Main</button>
+            </div>
+        </div>
+    </div>
+    <div class="page" data-density="hard">
+        <div class="page-content cover-page">
+            <div class="cover-vignette"></div>
+            <div class="cover-content"></div>
+        </div>
+    </div>
+
+        </div>
+    </div>
+
+    <div class="mobile-wrapper">
+        <div id="mobile-flipbook">
+            <div class="page" data-density="hard">
+                <div class="cover-page" id="mobile-cover">
+                    
+    <div class="cover-page">
+        <div class="cover-vignette"></div>
+        <div class="cover-content">
+            <img src="https://res.cloudinary.com/daucolvng/image/upload/f_auto,q_auto/BD_Logo_d4gza1" alt="Blue Diamond" class="cover-logo-hero" />
+            <div class="cov-ornament">
+                <div class="cov-orn-line"></div>
+                <div class="cov-orn-pip"></div>
+                <div class="cov-orn-line r"></div>
+            </div>
+            <h1 class="cov-t-blue">BLUE</h1>
+            <h1 class="cov-t-diamond">DIAMOND</h1>
+            <div class="cov-ornament narrow">
+                <div class="cov-orn-line"></div>
+                <div class="cov-orn-pip"></div>
+                <div class="cov-orn-line r"></div>
+            </div>
+            <p class="cov-jewellery">J E W E L L E R Y</p>
+        </div>
+        <div class="cover-invite">
+            <div class="cover-invite-line">
+                <div class="cover-invite-rule"></div>
+                <p>اقلب الصفحة لاكتشاف المجموعة</p>
+                <div class="cover-invite-rule right"></div>
+            </div>
+            <div class="chevron-pair"><div class="cover-chevron horizontal"></div><div class="cover-chevron horizontal"></div></div>
+        </div>
+    </div>
+                </div>
+            </div>
+            
+        <div class="page mobile-single-page" data-density="soft">
+            <div class="mobile-page-wrap">
+                <div class="mobile-img-panel" style="background-image: url('https://cdn.shopify.com/s/files/1/0707/3991/9016/files/PN-3065_12071c3e-f0ed-42ab-8716-6d5928c9a13a.jpg?v=1771780708')">
+                    <div class="vendor-tag">Bijouq</div>
+                    <div class="mobile-pnum">
+                        01<span> / 12</span>
+                    </div>
+                </div>
+                <div class="mobile-info-panel">
+                    <span class="exquisite-label">المجموعة الفاخرة</span>
+                    <h2 class="product-title">قلادة جيو ماتريكا كوشن موبي كبيرة</h2>
+                    <p class="product-ref">المرجع: PN-3065</p>
+                    <div class="gold-accent-line"></div>
+                    <div class="price-display">ر.ق ٥٢٦٣٠</div>
+                    <details class="accordion">
+                        <summary>القطعة</summary>
+                        <p>قلادة جيو ماتريكا كوشن موبي الكبيرة مصممة من الذهب عيار 18KP، بوزن 34.46 جرام. مصنوعة بعناية دقيقة، تعكس شخصية وبنية وفردية مميزة—مثالية لهواة الجمع وعشاق الأشكال الراقية.</p>
+                    </details>
+                    <details class="accordion">
+                        <summary>التفاصيل</summary>
+                        <p>وزن الذهب: 34.46 جرام<br>الماس (قيراط): RD 2.59 CT، VS-G. MP/MN 11.50 CT<br>لون الذهب: وردي<br>قابلة لتغيير الحجم: نعم<br>صنع في: إيطاليا</p>
+                    </details>
+                    <div class="slide-actions">
+                        <button onclick="handleAction('Add to Bag', 'PN-3065', 'قلادة جيو ماتريكا كوشن موبي كبيرة', 'Bijouq')" class="btn btn-primary">إضافة إلى الحقيبة</button>
+                        <button onclick="handleAction('Advisor', 'PN-3065', 'قلادة جيو ماتريكا كوشن موبي كبيرة', 'Bijouq')" class="btn btn-secondary-mobile">تحدث مع مستشار</button>
+                        <button onclick="handleAction('Buy Now', 'PN-3065', 'قلادة جيو ماتريكا كوشن موبي كبيرة', 'Bijouq')" class="btn btn-secondary-mobile">اشترِ الآن</button>
+                        <div class="view-cart-link" onclick="pfMobile.flip(13)">عرض المنتجات في السلة</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    
+        <div class="page mobile-single-page" data-density="soft">
+            <div class="mobile-page-wrap">
+                <div class="mobile-img-panel" style="background-image: url('https://cdn.shopify.com/s/files/1/0707/3991/9016/files/ER-5888_b0ef16ad-1e6f-4a3d-8775-68d6623c3a83.jpg?v=1771780691')">
+                    <div class="vendor-tag">Bijouq</div>
+                    <div class="mobile-pnum">
+                        02<span> / 12</span>
+                    </div>
+                </div>
+                <div class="mobile-info-panel">
+                    <span class="exquisite-label">المجموعة الفاخرة</span>
+                    <h2 class="product-title">أقراط إيدينيا الماسية</h2>
+                    <p class="product-ref">المرجع: ER-5888</p>
+                    <div class="gold-accent-line"></div>
+                    <div class="price-display">ر.ق ٥٠٨٥٠</div>
+                    <details class="accordion">
+                        <summary>القطعة</summary>
+                        <p>أقراط إيدينيا الماسية، مصممة من الذهب عيار 18 نقطة قيراط (18KP)، بوزن 18.43 جرام. صُنعت بعناية فائقة لتعكس الشخصية والبنية والتفرد—مثالية لهواة الجمع والمعجبين بالأشكال الراقية.</p>
+                    </details>
+                    <details class="accordion">
+                        <summary>التفاصيل</summary>
+                        <p>وزن الذهب: 18.43 جرام<br>الماس (قيراط): RD 2.76 CT، VS-G. MQ 0.47 CT، VS-G. PE 1.32 CT، VS-G<br>لون الذهب: وردي<br>قابلة لتعديل المقاس: نعم<br>صُنع في: إيطاليا<br>يرجى ملاحظة أن أوصاف المنتجات قد تختلف قليلاً حسب الحجم وتفاوت الصنعة.</p>
+                    </details>
+                    <div class="slide-actions">
+                        <button onclick="handleAction('Add to Bag', 'ER-5888', 'أقراط إيدينيا الماسية', 'Bijouq')" class="btn btn-primary">إضافة إلى الحقيبة</button>
+                        <button onclick="handleAction('Advisor', 'ER-5888', 'أقراط إيدينيا الماسية', 'Bijouq')" class="btn btn-secondary-mobile">تحدث مع مستشار</button>
+                        <button onclick="handleAction('Buy Now', 'ER-5888', 'أقراط إيدينيا الماسية', 'Bijouq')" class="btn btn-secondary-mobile">اشترِ الآن</button>
+                        <div class="view-cart-link" onclick="pfMobile.flip(13)">عرض المنتجات في السلة</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    
+        <div class="page mobile-single-page" data-density="soft">
+            <div class="mobile-page-wrap">
+                <div class="mobile-img-panel" style="background-image: url('https://cdn.shopify.com/s/files/1/0707/3991/9016/files/NK-2510_1a70fbad-2fb3-417c-8a1a-1aa8f5572850.jpg?v=1771778839')">
+                    <div class="vendor-tag">Luca Carati</div>
+                    <div class="mobile-pnum">
+                        03<span> / 12</span>
+                    </div>
+                </div>
+                <div class="mobile-info-panel">
+                    <span class="exquisite-label">المجموعة الفاخرة</span>
+                    <h2 class="product-title">عقد مسألة ضوء مع لؤلؤ - كبير</h2>
+                    <p class="product-ref">المرجع: NK-2510</p>
+                    <div class="gold-accent-line"></div>
+                    <div class="price-display">ر.ق ١٤٩٣١</div>
+                    <details class="accordion">
+                        <summary>القطعة</summary>
+                        <p>تحية للأناقة، حيث يرقص الضوء على الذهب.</p>
+                    </details>
+                    <details class="accordion">
+                        <summary>التفاصيل</summary>
+                        <p>وزن الذهب: 23.37 ج<br>الماس (قيراط): R RD 2.96 قيراط، VVS-G. PRS 3.44 قيراط<br>لون الذهب: وردي<br>قابل للتعديل: لا<br>صنع في: إيطاليا</p>
+                    </details>
+                    <div class="slide-actions">
+                        <button onclick="handleAction('Add to Bag', 'NK-2510', 'عقد مسألة ضوء مع لؤلؤ - كبير', 'Luca Carati')" class="btn btn-primary">إضافة إلى الحقيبة</button>
+                        <button onclick="handleAction('Advisor', 'NK-2510', 'عقد مسألة ضوء مع لؤلؤ - كبير', 'Luca Carati')" class="btn btn-secondary-mobile">تحدث مع مستشار</button>
+                        <button onclick="handleAction('Buy Now', 'NK-2510', 'عقد مسألة ضوء مع لؤلؤ - كبير', 'Luca Carati')" class="btn btn-secondary-mobile">اشترِ الآن</button>
+                        <div class="view-cart-link" onclick="pfMobile.flip(13)">عرض المنتجات في السلة</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    
+        <div class="page mobile-single-page" data-density="soft">
+            <div class="mobile-page-wrap">
+                <div class="mobile-img-panel" style="background-image: url('https://cdn.shopify.com/s/files/1/0707/3991/9016/files/BR-2388_67ea1770-18cf-4a50-aae2-3a0579f69c28.png?v=1763448613')">
+                    <div class="vendor-tag">J Jewels</div>
+                    <div class="mobile-pnum">
+                        04<span> / 12</span>
+                    </div>
+                </div>
+                <div class="mobile-info-panel">
+                    <span class="exquisite-label">المجموعة الفاخرة</span>
+                    <h2 class="product-title">سوار موجة من الذهب عيار 18 قيراط</h2>
+                    <p class="product-ref">المرجع: BR-2388</p>
+                    <div class="gold-accent-line"></div>
+                    <div class="price-display">ر.ق ٤٦١١٦</div>
+                    <details class="accordion">
+                        <summary>القطعة</summary>
+                        <p>سوار موجة نحتية من الذهب الأصفر عيار 18 قيراط مع 1.5 قيراط من الألماس بدرجة نقاء VS-G.</p>
+                    </details>
+                    <details class="accordion">
+                        <summary>التفاصيل</summary>
+                        <p>وزن الذهب: 32.10 جرام<br>الألماس (قيراط): RD 1.5 قيراط، VS-G<br>لون الذهب: أصفر<br>قابل للتعديل: لا<br>صُنع في: إيطاليا</p>
+                    </details>
+                    <div class="slide-actions">
+                        <button onclick="handleAction('Add to Bag', 'BR-2388', 'سوار موجة من الذهب عيار 18 قيراط', 'J Jewels')" class="btn btn-primary">إضافة إلى الحقيبة</button>
+                        <button onclick="handleAction('Advisor', 'BR-2388', 'سوار موجة من الذهب عيار 18 قيراط', 'J Jewels')" class="btn btn-secondary-mobile">تحدث مع مستشار</button>
+                        <button onclick="handleAction('Buy Now', 'BR-2388', 'سوار موجة من الذهب عيار 18 قيراط', 'J Jewels')" class="btn btn-secondary-mobile">اشترِ الآن</button>
+                        <div class="view-cart-link" onclick="pfMobile.flip(13)">عرض المنتجات في السلة</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    
+        <div class="page mobile-single-page" data-density="soft">
+            <div class="mobile-page-wrap">
+                <div class="mobile-img-panel" style="background-image: url('https://cdn.shopify.com/s/files/1/0707/3991/9016/files/BR-2390_5d8ede45-acb0-4938-b9e2-8d179f25d275.png?v=1763448605')">
+                    <div class="vendor-tag">J Jewels</div>
+                    <div class="mobile-pnum">
+                        05<span> / 12</span>
+                    </div>
+                </div>
+                <div class="mobile-info-panel">
+                    <span class="exquisite-label">المجموعة الفاخرة</span>
+                    <h2 class="product-title">سوار صوفيا الأنيق من الذهب عيار 18</h2>
+                    <p class="product-ref">المرجع: BR-2390</p>
+                    <div class="gold-accent-line"></div>
+                    <div class="price-display">ر.ق ٤٧٣٤٨</div>
+                    <details class="accordion">
+                        <summary>القطعة</summary>
+                        <p>سوار صوفيا الأنيق من الذهب الأبيض عيار 18 قيراط مزين بـ 3.05 قيراط من الماس بدرجة نقاء VS-G.</p>
+                    </details>
+                    <details class="accordion">
+                        <summary>التفاصيل</summary>
+                        <p>وزن الذهب: 27.90 جم<br>الماس (قيراط): RD 3.05 قيراط, VS-G<br>لون الذهب: أبيض<br>قابل لتعديل الحجم: لا<br>صُنع في: إيطاليا</p>
+                    </details>
+                    <div class="slide-actions">
+                        <button onclick="handleAction('Add to Bag', 'BR-2390', 'سوار صوفيا الأنيق من الذهب عيار 18', 'J Jewels')" class="btn btn-primary">إضافة إلى الحقيبة</button>
+                        <button onclick="handleAction('Advisor', 'BR-2390', 'سوار صوفيا الأنيق من الذهب عيار 18', 'J Jewels')" class="btn btn-secondary-mobile">تحدث مع مستشار</button>
+                        <button onclick="handleAction('Buy Now', 'BR-2390', 'سوار صوفيا الأنيق من الذهب عيار 18', 'J Jewels')" class="btn btn-secondary-mobile">اشترِ الآن</button>
+                        <div class="view-cart-link" onclick="pfMobile.flip(13)">عرض المنتجات في السلة</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    
+        <div class="page mobile-single-page" data-density="soft">
+            <div class="mobile-page-wrap">
+                <div class="mobile-img-panel" style="background-image: url('https://cdn.shopify.com/s/files/1/0707/3991/9016/files/NK-3940_d3da2f96-0b82-424b-8b0f-ef53af9c13ae.png?v=1763448601')">
+                    <div class="vendor-tag">J Jewels</div>
+                    <div class="mobile-pnum">
+                        06<span> / 12</span>
+                    </div>
+                </div>
+                <div class="mobile-info-panel">
+                    <span class="exquisite-label">المجموعة الفاخرة</span>
+                    <h2 class="product-title">قلادة دقيقة من الذهب عيار 18 قيراط على شكل ورقة</h2>
+                    <p class="product-ref">المرجع: NK-3940</p>
+                    <div class="gold-accent-line"></div>
+                    <div class="price-display">ر.ق ٤٥٢٤٨.٥</div>
+                    <details class="accordion">
+                        <summary>القطعة</summary>
+                        <p>قلادة دقيقة من الذهب الأبيض عيار 18 قيراط على شكل ورقة مزينة بألماس يزن 2.41 قيراط وأحجار ياقوت وردي تزن 1 قيراط.</p>
+                    </details>
+                    <details class="accordion">
+                        <summary>التفاصيل</summary>
+                        <p>وزن الذهب: 23.50 جرام<br>ألماس (قيراط): RD 2.41 قيراط، VS-G<br>لون الذهب: أبيض<br>قابلة للتعديل: لا<br>صُنع في: إيطاليا</p>
+                    </details>
+                    <div class="slide-actions">
+                        <button onclick="handleAction('Add to Bag', 'NK-3940', 'قلادة دقيقة من الذهب عيار 18 قيراط على شكل ورقة', 'J Jewels')" class="btn btn-primary">إضافة إلى الحقيبة</button>
+                        <button onclick="handleAction('Advisor', 'NK-3940', 'قلادة دقيقة من الذهب عيار 18 قيراط على شكل ورقة', 'J Jewels')" class="btn btn-secondary-mobile">تحدث مع مستشار</button>
+                        <button onclick="handleAction('Buy Now', 'NK-3940', 'قلادة دقيقة من الذهب عيار 18 قيراط على شكل ورقة', 'J Jewels')" class="btn btn-secondary-mobile">اشترِ الآن</button>
+                        <div class="view-cart-link" onclick="pfMobile.flip(13)">عرض المنتجات في السلة</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    
+        <div class="page mobile-single-page" data-density="soft">
+            <div class="mobile-page-wrap">
+                <div class="mobile-img-panel" style="background-image: url('https://cdn.shopify.com/s/files/1/0707/3991/9016/files/ER-3726_9bf19386-7330-4d80-87c2-933f650501e9.png?v=1762088956')">
+                    <div class="vendor-tag">Cashmere</div>
+                    <div class="mobile-pnum">
+                        07<span> / 12</span>
+                    </div>
+                </div>
+                <div class="mobile-info-panel">
+                    <span class="exquisite-label">المجموعة الفاخرة</span>
+                    <h2 class="product-title">أقراط شاين تشارم مع الماس</h2>
+                    <p class="product-ref">المرجع: ER-3726</p>
+                    <div class="gold-accent-line"></div>
+                    <div class="price-display">ر.ق ٥٣٠٠١</div>
+                    <details class="accordion">
+                        <summary>القطعة</summary>
+                        <p>أقراط من الذهب الأبيض عيار 18 قيراط مع ماس على شكل كمثرى ودائري بدرجة نقاء VS-G لتألق مشع.</p>
+                    </details>
+                    <details class="accordion">
+                        <summary>التفاصيل</summary>
+                        <p>وزن الذهب: 10.78 غ<br>الماسة (قيراط): كمثرى 3.84 قيراط، VS-G. دائري 1.5 قيراط، VS-G<br>لون الذهب: أبيض<br>قابل للتعديل: لا<br>صُنع في: إيطاليا</p>
+                    </details>
+                    <div class="slide-actions">
+                        <button onclick="handleAction('Add to Bag', 'ER-3726', 'أقراط شاين تشارم مع الماس', 'Cashmere')" class="btn btn-primary">إضافة إلى الحقيبة</button>
+                        <button onclick="handleAction('Advisor', 'ER-3726', 'أقراط شاين تشارم مع الماس', 'Cashmere')" class="btn btn-secondary-mobile">تحدث مع مستشار</button>
+                        <button onclick="handleAction('Buy Now', 'ER-3726', 'أقراط شاين تشارم مع الماس', 'Cashmere')" class="btn btn-secondary-mobile">اشترِ الآن</button>
+                        <div class="view-cart-link" onclick="pfMobile.flip(13)">عرض المنتجات في السلة</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    
+        <div class="page mobile-single-page" data-density="soft">
+            <div class="mobile-page-wrap">
+                <div class="mobile-img-panel" style="background-image: url('https://cdn.shopify.com/s/files/1/0707/3991/9016/files/BR-2394_ff1cbb23-bcf3-4035-8b31-e7a2c67fe968.png?v=1763448580')">
+                    <div class="vendor-tag">J Jewels</div>
+                    <div class="mobile-pnum">
+                        08<span> / 12</span>
+                    </div>
+                </div>
+                <div class="mobile-info-panel">
+                    <span class="exquisite-label">المجموعة الفاخرة</span>
+                    <h2 class="product-title">سوار سيرس اليومي من الذهب عيار 18</h2>
+                    <p class="product-ref">المرجع: BR-2394</p>
+                    <div class="gold-accent-line"></div>
+                    <div class="price-display">ر.ق ٤٥٣٧٢</div>
+                    <details class="accordion">
+                        <summary>القطعة</summary>
+                        <p>سوار سيرس مصنوع من الذهب الأصفر عيار 18 مزين بألماس بدرجة وضوح VS-G ووزن 1.6 قيراط لإطلالة أنيقة يومية.</p>
+                    </details>
+                    <details class="accordion">
+                        <summary>التفاصيل</summary>
+                        <p>وزن الذهب: 32.90 جرام<br>الألماس (قيراط): RD 1.6 CT، VS-G<br>لون الذهب: أصفر<br>قابل لتعديل الحجم: لا<br>صُنع في: إيطاليا</p>
+                    </details>
+                    <div class="slide-actions">
+                        <button onclick="handleAction('Add to Bag', 'BR-2394', 'سوار سيرس اليومي من الذهب عيار 18', 'J Jewels')" class="btn btn-primary">إضافة إلى الحقيبة</button>
+                        <button onclick="handleAction('Advisor', 'BR-2394', 'سوار سيرس اليومي من الذهب عيار 18', 'J Jewels')" class="btn btn-secondary-mobile">تحدث مع مستشار</button>
+                        <button onclick="handleAction('Buy Now', 'BR-2394', 'سوار سيرس اليومي من الذهب عيار 18', 'J Jewels')" class="btn btn-secondary-mobile">اشترِ الآن</button>
+                        <div class="view-cart-link" onclick="pfMobile.flip(13)">عرض المنتجات في السلة</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    
+        <div class="page mobile-single-page" data-density="soft">
+            <div class="mobile-page-wrap">
+                <div class="mobile-img-panel" style="background-image: url('https://cdn.shopify.com/s/files/1/0707/3991/9016/files/BR-2392_357b57e1-5d4d-4f84-858a-f2bb1b7be060.png?v=1763448565')">
+                    <div class="vendor-tag">J Jewels</div>
+                    <div class="mobile-pnum">
+                        09<span> / 12</span>
+                    </div>
+                </div>
+                <div class="mobile-info-panel">
+                    <span class="exquisite-label">المجموعة الفاخرة</span>
+                    <h2 class="product-title">سوار أبراسيو الفاخر عيار 18 قيراط</h2>
+                    <p class="product-ref">المرجع: BR-2392</p>
+                    <div class="gold-accent-line"></div>
+                    <div class="price-display">ر.ق ٥٠٨١٥.٥</div>
+                    <details class="accordion">
+                        <summary>القطعة</summary>
+                        <p>سوار أبراسيو الفاخر من الذهب الأصفر عيار 18 قيراط، مزين بألماس وزنه 5.12 قيراط بدرجة نقاء VS-G.</p>
+                    </details>
+                    <details class="accordion">
+                        <summary>التفاصيل</summary>
+                        <p>وزن الذهب: 26.70 جرام<br>الماس (قيراط): RD 5.12 CT, VS-G<br>لون الذهب: أصفر<br>قابلية التعديل: لا<br>صُنع في: إيطاليا<br><br>يرجى ملاحظة أن وصف المنتج قد يختلف قليلاً حسب حجم وتصنيع القطعة.</p>
+                    </details>
+                    <div class="slide-actions">
+                        <button onclick="handleAction('Add to Bag', 'BR-2392', 'سوار أبراسيو الفاخر عيار 18 قيراط', 'J Jewels')" class="btn btn-primary">إضافة إلى الحقيبة</button>
+                        <button onclick="handleAction('Advisor', 'BR-2392', 'سوار أبراسيو الفاخر عيار 18 قيراط', 'J Jewels')" class="btn btn-secondary-mobile">تحدث مع مستشار</button>
+                        <button onclick="handleAction('Buy Now', 'BR-2392', 'سوار أبراسيو الفاخر عيار 18 قيراط', 'J Jewels')" class="btn btn-secondary-mobile">اشترِ الآن</button>
+                        <div class="view-cart-link" onclick="pfMobile.flip(13)">عرض المنتجات في السلة</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    
+        <div class="page mobile-single-page" data-density="soft">
+            <div class="mobile-page-wrap">
+                <div class="mobile-img-panel" style="background-image: url('https://cdn.shopify.com/s/files/1/0707/3991/9016/files/ER-5649_8b54185c-012b-4f4b-a82b-3812a1e090c6.jpg?v=1756912972')">
+                    <div class="vendor-tag">Bijouq</div>
+                    <div class="mobile-pnum">
+                        10<span> / 12</span>
+                    </div>
+                </div>
+                <div class="mobile-info-panel">
+                    <span class="exquisite-label">المجموعة الفاخرة</span>
+                    <h2 class="product-title">أقراط إيدينيا دياموندز، الذهب الأبيض</h2>
+                    <p class="product-ref">المرجع: ER-5649</p>
+                    <div class="gold-accent-line"></div>
+                    <div class="price-display">ر.ق ٤٨٣٠٨</div>
+                    <details class="accordion">
+                        <summary>القطعة</summary>
+                        <p>أقراط إيدينيا دياموندز مصممة من ذهب عيار 18KW، بوزن 15.6 جرام. مصنوعة بعناية فائقة، تعكس الشخصية، البنية، والفردية—مثالية لهواة الجمع وعشاق الأشكال الراقية.</p>
+                    </details>
+                    <details class="accordion">
+                        <summary>التفاصيل</summary>
+                        <p>وزن الذهب: 15.6 جرام<br>الألماس (قيراط): RD 2.8 CT، VS-G. MQ 0.45 CT، VS-G. PE 1.39 CT، VS-G<br>لون الذهب: وردي<br>قابل للتعديل: نعم<br>صنع في: إيطاليا</p>
+                    </details>
+                    <div class="slide-actions">
+                        <button onclick="handleAction('Add to Bag', 'ER-5649', 'أقراط إيدينيا دياموندز، الذهب الأبيض', 'Bijouq')" class="btn btn-primary">إضافة إلى الحقيبة</button>
+                        <button onclick="handleAction('Advisor', 'ER-5649', 'أقراط إيدينيا دياموندز، الذهب الأبيض', 'Bijouq')" class="btn btn-secondary-mobile">تحدث مع مستشار</button>
+                        <button onclick="handleAction('Buy Now', 'ER-5649', 'أقراط إيدينيا دياموندز، الذهب الأبيض', 'Bijouq')" class="btn btn-secondary-mobile">اشترِ الآن</button>
+                        <div class="view-cart-link" onclick="pfMobile.flip(13)">عرض المنتجات في السلة</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    
+        <div class="page mobile-single-page" data-density="soft">
+            <div class="mobile-page-wrap">
+                <div class="mobile-img-panel" style="background-image: url('https://cdn.shopify.com/s/files/1/0707/3991/9016/files/NK-2579_03df9727-ef9c-407e-9c35-9e4b62153312.jpg?v=1754897837')">
+                    <div class="vendor-tag">Luca Carati</div>
+                    <div class="mobile-pnum">
+                        11<span> / 12</span>
+                    </div>
+                </div>
+                <div class="mobile-info-panel">
+                    <span class="exquisite-label">المجموعة الفاخرة</span>
+                    <h2 class="product-title">عقد آرت ديكو</h2>
+                    <p class="product-ref">المرجع: NK-2579</p>
+                    <div class="gold-accent-line"></div>
+                    <div class="price-display">ر.ق ٤٦٦٢٠</div>
+                    <details class="accordion">
+                        <summary>القطعة</summary>
+                        <p>تحية للأناقة، حيث يرقص الضوء على الذهب.</p>
+                    </details>
+                    <details class="accordion">
+                        <summary>التفاصيل</summary>
+                        <p>وزن الذهب: 20.24 غرام<br>الماس (القيراط): RD 3.31CT، VVS-G.<br>لون الذهب: وردي<br>قابل لتغيير الحجم: لا<br>صُنع في: إيطاليا<br><br>يرجى ملاحظة أن وصف المنتج قد يختلف قليلاً حسب حجم القطعة وتفاوتات الصنعة.</p>
+                    </details>
+                    <div class="slide-actions">
+                        <button onclick="handleAction('Add to Bag', 'NK-2579', 'عقد آرت ديكو', 'Luca Carati')" class="btn btn-primary">إضافة إلى الحقيبة</button>
+                        <button onclick="handleAction('Advisor', 'NK-2579', 'عقد آرت ديكو', 'Luca Carati')" class="btn btn-secondary-mobile">تحدث مع مستشار</button>
+                        <button onclick="handleAction('Buy Now', 'NK-2579', 'عقد آرت ديكو', 'Luca Carati')" class="btn btn-secondary-mobile">اشترِ الآن</button>
+                        <div class="view-cart-link" onclick="pfMobile.flip(13)">عرض المنتجات في السلة</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    
+        <div class="page mobile-single-page" data-density="soft">
+            <div class="mobile-page-wrap">
+                <div class="mobile-img-panel" style="background-image: url('https://cdn.shopify.com/s/files/1/0707/3991/9016/files/PN-2865.jpg?v=1751271565')">
+                    <div class="vendor-tag">Bijouq</div>
+                    <div class="mobile-pnum">
+                        12<span> / 12</span>
+                    </div>
+                </div>
+                <div class="mobile-info-panel">
+                    <span class="exquisite-label">المجموعة الفاخرة</span>
+                    <h2 class="product-title">قلادة جيوماتريكا الوسادة الياقوت الوردي، كبيرة</h2>
+                    <p class="product-ref">المرجع: PN-2865</p>
+                    <div class="gold-accent-line"></div>
+                    <div class="price-display">ر.ق ٤٧٥٠٠</div>
+                    <details class="accordion">
+                        <summary>القطعة</summary>
+                        <p>قلادة جيوماتريكا الوسادة الياقوت الوردي الكبيرة مصممة من الذهب عيار 18KP، بوزن 35.16 جرام. مصنوعة بعناية دقيقة، تعكس الشخصية، والبنية، والفردية — مثالية لهواة الجمع وعشاق الأشكال الراقية.</p>
+                    </details>
+                    <details class="accordion">
+                        <summary>التفاصيل</summary>
+                        <p>وزن الذهب: 35.16 جرام<br>الماس (قيراط): RD 2.45 CT، VS-G. PRS 2.75 CT. MP/MN 0.30 CT<br>لون الذهب: وردي<br>قابلة لتعديل الحجم: نعم<br>صُنعت في: إيطاليا</p>
+                    </details>
+                    <div class="slide-actions">
+                        <button onclick="handleAction('Add to Bag', 'PN-2865', 'قلادة جيوماتريكا الوسادة الياقوت الوردي، كبيرة', 'Bijouq')" class="btn btn-primary">إضافة إلى الحقيبة</button>
+                        <button onclick="handleAction('Advisor', 'PN-2865', 'قلادة جيوماتريكا الوسادة الياقوت الوردي، كبيرة', 'Bijouq')" class="btn btn-secondary-mobile">تحدث مع مستشار</button>
+                        <button onclick="handleAction('Buy Now', 'PN-2865', 'قلادة جيوماتريكا الوسادة الياقوت الوردي، كبيرة', 'Bijouq')" class="btn btn-secondary-mobile">اشترِ الآن</button>
+                        <div class="view-cart-link" onclick="pfMobile.flip(13)">عرض المنتجات في السلة</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    
+    <div class="page mobile-single-page" data-density="hard">
+        <div class="mobile-page-wrap">
+            <div class="mobile-info-panel cart-page">
+                <span class="chapter-label">إختياراتك</span>
+                <h2 class="chapter-title">حقيبة التسوّق الخاصة بي</h2>
+                <div class="gold-accent-line centered"></div>
+                <div id="cart-container-mobile" class="cart-items-container">
+                    <!-- Dynamic Cart Items -->
+                </div>
+                <button onclick="pfMobile.flip(1)" class="btn btn-secondary-mobile" style="margin-top:20px;">مواصلة الاستكشاف</button>
+            </div>
+        </div>
+    </div>
+    <div class="page mobile-single-page" data-density="hard">
+        <div class="page-content end-page mobile-end">
+            <div class="end-inner">
+                <img src="https://res.cloudinary.com/daucolvng/image/upload/f_auto,q_auto/BD_Logo_d4gza1" class="end-logo" alt="BD Logo">
+                <h2 class="chapter-title">THE END</h2>
+                <div class="gold-accent-line centered"></div>
+                <p class="end-message">شكرًا لك على الاستكشاف.</p>
+                <button onclick="pfMobile.flip(1)" class="btn btn-primary" style="margin-top:20px;">Return to Collections</button>
+            </div>
+        </div>
+    </div>
+
+        </div>
+        <button id="mobile-prev" class="mobile-nav-btn prev" aria-label="Previous">&#8249;</button>
+        <button id="mobile-next" class="mobile-nav-btn next" aria-label="Next">&#8250;</button>
+    </div>
+
+    <div id="actionModal" class="custom-modal" onclick="handleModalBackdropClick(event)">
+        <div class="modal-content" id="modalInner"></div>
+    </div>
+
+    <div id="luxuryPopup" class="luxury-popup" onclick="handlePopupBackdropClick(event)">
+        <div class="luxury-popup-content" id="luxuryPopupInner">
+            <!-- Dynamic Product Details -->
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/page-flip@2.0.7/dist/js/page-flip.browser.min.js"></script>
+    <script>
+        let pf, pfMobile;
+        let currentPendingAction = null;
+        let catalogueProducts = [{"price":"٥٢٦٣٠","details":"وزن الذهب: 34.46 جرام\nالماس (قيراط): RD 2.59 CT، VS-G. MP/MN 11.50 CT\nلون الذهب: وردي\nقابلة لتغيير الحجم: نعم\nصنع في: إيطاليا","description":"قلادة جيو ماتريكا كوشن موبي الكبيرة مصممة من الذهب عيار 18KP، بوزن 34.46 جرام. مصنوعة بعناية دقيقة، تعكس شخصية وبنية وفردية مميزة—مثالية لهواة الجمع وعشاق الأشكال الراقية.","product_name":"قلادة جيو ماتريكا كوشن موبي كبيرة","vendor":"Bijouq","product_code":"PN-3065","product_image":"https://cdn.shopify.com/s/files/1/0707/3991/9016/files/PN-3065_12071c3e-f0ed-42ab-8716-6d5928c9a13a.jpg?v=1771780708"},{"price":"٥٠٨٥٠","details":"وزن الذهب: 18.43 جرام\nالماس (قيراط): RD 2.76 CT، VS-G. MQ 0.47 CT، VS-G. PE 1.32 CT، VS-G\nلون الذهب: وردي\nقابلة لتعديل المقاس: نعم\nصُنع في: إيطاليا\nيرجى ملاحظة أن أوصاف المنتجات قد تختلف قليلاً حسب الحجم وتفاوت الصنعة.","description":"أقراط إيدينيا الماسية، مصممة من الذهب عيار 18 نقطة قيراط (18KP)، بوزن 18.43 جرام. صُنعت بعناية فائقة لتعكس الشخصية والبنية والتفرد—مثالية لهواة الجمع والمعجبين بالأشكال الراقية.","product_name":"أقراط إيدينيا الماسية","vendor":"Bijouq","product_code":"ER-5888","product_image":"https://cdn.shopify.com/s/files/1/0707/3991/9016/files/ER-5888_b0ef16ad-1e6f-4a3d-8775-68d6623c3a83.jpg?v=1771780691"},{"price":"١٤٩٣١","details":"وزن الذهب: 23.37 ج\nالماس (قيراط): R RD 2.96 قيراط، VVS-G. PRS 3.44 قيراط\nلون الذهب: وردي\nقابل للتعديل: لا\nصنع في: إيطاليا","description":"تحية للأناقة، حيث يرقص الضوء على الذهب.","product_name":"عقد مسألة ضوء مع لؤلؤ - كبير","vendor":"Luca Carati","product_code":"NK-2510","product_image":"https://cdn.shopify.com/s/files/1/0707/3991/9016/files/NK-2510_1a70fbad-2fb3-417c-8a1a-1aa8f5572850.jpg?v=1771778839"},{"price":"٤٦١١٦","details":"وزن الذهب: 32.10 جرام\nالألماس (قيراط): RD 1.5 قيراط، VS-G\nلون الذهب: أصفر\nقابل للتعديل: لا\nصُنع في: إيطاليا","description":"سوار موجة نحتية من الذهب الأصفر عيار 18 قيراط مع 1.5 قيراط من الألماس بدرجة نقاء VS-G.","product_name":"سوار موجة من الذهب عيار 18 قيراط","vendor":"J Jewels","product_code":"BR-2388","product_image":"https://cdn.shopify.com/s/files/1/0707/3991/9016/files/BR-2388_67ea1770-18cf-4a50-aae2-3a0579f69c28.png?v=1763448613"},{"price":"٤٧٣٤٨","details":"وزن الذهب: 27.90 جم\nالماس (قيراط): RD 3.05 قيراط, VS-G\nلون الذهب: أبيض\nقابل لتعديل الحجم: لا\nصُنع في: إيطاليا","description":"سوار صوفيا الأنيق من الذهب الأبيض عيار 18 قيراط مزين بـ 3.05 قيراط من الماس بدرجة نقاء VS-G.","product_name":"سوار صوفيا الأنيق من الذهب عيار 18","vendor":"J Jewels","product_code":"BR-2390","product_image":"https://cdn.shopify.com/s/files/1/0707/3991/9016/files/BR-2390_5d8ede45-acb0-4938-b9e2-8d179f25d275.png?v=1763448605"},{"price":"٤٥٢٤٨.٥","details":"وزن الذهب: 23.50 جرام\nألماس (قيراط): RD 2.41 قيراط، VS-G\nلون الذهب: أبيض\nقابلة للتعديل: لا\nصُنع في: إيطاليا","description":"قلادة دقيقة من الذهب الأبيض عيار 18 قيراط على شكل ورقة مزينة بألماس يزن 2.41 قيراط وأحجار ياقوت وردي تزن 1 قيراط.","product_name":"قلادة دقيقة من الذهب عيار 18 قيراط على شكل ورقة","vendor":"J Jewels","product_code":"NK-3940","product_image":"https://cdn.shopify.com/s/files/1/0707/3991/9016/files/NK-3940_d3da2f96-0b82-424b-8b0f-ef53af9c13ae.png?v=1763448601"},{"price":"٥٣٠٠١","details":"وزن الذهب: 10.78 غ\nالماسة (قيراط): كمثرى 3.84 قيراط، VS-G. دائري 1.5 قيراط، VS-G\nلون الذهب: أبيض\nقابل للتعديل: لا\nصُنع في: إيطاليا","description":"أقراط من الذهب الأبيض عيار 18 قيراط مع ماس على شكل كمثرى ودائري بدرجة نقاء VS-G لتألق مشع.","product_name":"أقراط شاين تشارم مع الماس","vendor":"Cashmere","product_code":"ER-3726","product_image":"https://cdn.shopify.com/s/files/1/0707/3991/9016/files/ER-3726_9bf19386-7330-4d80-87c2-933f650501e9.png?v=1762088956"},{"price":"٤٥٣٧٢","details":"وزن الذهب: 32.90 جرام\nالألماس (قيراط): RD 1.6 CT، VS-G\nلون الذهب: أصفر\nقابل لتعديل الحجم: لا\nصُنع في: إيطاليا","description":"سوار سيرس مصنوع من الذهب الأصفر عيار 18 مزين بألماس بدرجة وضوح VS-G ووزن 1.6 قيراط لإطلالة أنيقة يومية.","product_name":"سوار سيرس اليومي من الذهب عيار 18","vendor":"J Jewels","product_code":"BR-2394","product_image":"https://cdn.shopify.com/s/files/1/0707/3991/9016/files/BR-2394_ff1cbb23-bcf3-4035-8b31-e7a2c67fe968.png?v=1763448580"},{"price":"٥٠٨١٥.٥","details":"وزن الذهب: 26.70 جرام\nالماس (قيراط): RD 5.12 CT, VS-G\nلون الذهب: أصفر\nقابلية التعديل: لا\nصُنع في: إيطاليا\n\nيرجى ملاحظة أن وصف المنتج قد يختلف قليلاً حسب حجم وتصنيع القطعة.","description":"سوار أبراسيو الفاخر من الذهب الأصفر عيار 18 قيراط، مزين بألماس وزنه 5.12 قيراط بدرجة نقاء VS-G.","product_name":"سوار أبراسيو الفاخر عيار 18 قيراط","vendor":"J Jewels","product_code":"BR-2392","product_image":"https://cdn.shopify.com/s/files/1/0707/3991/9016/files/BR-2392_357b57e1-5d4d-4f84-858a-f2bb1b7be060.png?v=1763448565"},{"price":"٤٨٣٠٨","details":"وزن الذهب: 15.6 جرام\nالألماس (قيراط): RD 2.8 CT، VS-G. MQ 0.45 CT، VS-G. PE 1.39 CT، VS-G\nلون الذهب: وردي\nقابل للتعديل: نعم\nصنع في: إيطاليا","description":"أقراط إيدينيا دياموندز مصممة من ذهب عيار 18KW، بوزن 15.6 جرام. مصنوعة بعناية فائقة، تعكس الشخصية، البنية، والفردية—مثالية لهواة الجمع وعشاق الأشكال الراقية.","product_name":"أقراط إيدينيا دياموندز، الذهب الأبيض","vendor":"Bijouq","product_code":"ER-5649","product_image":"https://cdn.shopify.com/s/files/1/0707/3991/9016/files/ER-5649_8b54185c-012b-4f4b-a82b-3812a1e090c6.jpg?v=1756912972"},{"price":"٤٦٦٢٠","details":"وزن الذهب: 20.24 غرام\nالماس (القيراط): RD 3.31CT، VVS-G.\nلون الذهب: وردي\nقابل لتغيير الحجم: لا\nصُنع في: إيطاليا\n\nيرجى ملاحظة أن وصف المنتج قد يختلف قليلاً حسب حجم القطعة وتفاوتات الصنعة.","description":"تحية للأناقة، حيث يرقص الضوء على الذهب.","product_name":"عقد آرت ديكو","vendor":"Luca Carati","product_code":"NK-2579","product_image":"https://cdn.shopify.com/s/files/1/0707/3991/9016/files/NK-2579_03df9727-ef9c-407e-9c35-9e4b62153312.jpg?v=1754897837"},{"price":"٤٧٥٠٠","details":"وزن الذهب: 35.16 جرام\nالماس (قيراط): RD 2.45 CT، VS-G. PRS 2.75 CT. MP/MN 0.30 CT\nلون الذهب: وردي\nقابلة لتعديل الحجم: نعم\nصُنعت في: إيطاليا","description":"قلادة جيوماتريكا الوسادة الياقوت الوردي الكبيرة مصممة من الذهب عيار 18KP، بوزن 35.16 جرام. مصنوعة بعناية دقيقة، تعكس الشخصية، والبنية، والفردية — مثالية لهواة الجمع وعشاق الأشكال الراقية.","product_name":"قلادة جيوماتريكا الوسادة الياقوت الوردي، كبيرة","vendor":"Bijouq","product_code":"PN-2865","product_image":"https://cdn.shopify.com/s/files/1/0707/3991/9016/files/PN-2865.jpg?v=1751271565"}];
+        let cartData = [{"price":"٨٧٧٥","details":"وزن الذهب: 4.79 جرام\nالماس (القيراط): RD 0.53 CT، VVS-G\nلون الذهب: وردي\nقابل للتعديل: لا\nصُنع في: إيطاليا\n\nيرجى ملاحظة أن أوصاف المنتجات قد تختلف قليلاً حسب الحجم وتفاوتات الصنعة.","description":"تدفق من الأناقة المصقولة تتدلى بسحر خالد.","product_name":"قلادة نجم آرت ديكو","vendor":"Luca Carati","product_code":"NK-2503","product_image":"https://cdn.shopify.com/s/files/1/0707/3991/9016/files/NK-2503_d612fd3f-98d5-414c-824a-8ed07009ad12.jpg?v=1754718837","tag":[{"name":"Art Deco","id":"7136289000003538769","color_code":null}],"Cart_Added_At":"2026-06-11T07:53:41+03:00"},{"price":"٨٧٧٥","details":"وزن الذهب: 4.79 جرام\nالماس (القيراط): RD 0.53 CT، VVS-G\nلون الذهب: وردي\nقابل للتعديل: لا\nصُنع في: إيطاليا\n\nيرجى ملاحظة أن أوصاف المنتجات قد تختلف قليلاً حسب الحجم وتفاوتات الصنعة.","description":"تدفق من الأناقة المصقولة تتدلى بسحر خالد.","product_name":"قلادة نجم آرت ديكو","vendor":"Luca Carati","product_code":"NK-2503","product_image":"https://cdn.shopify.com/s/files/1/0707/3991/9016/files/NK-2503_d612fd3f-98d5-414c-824a-8ed07009ad12.jpg?v=1754718837","tag":[{"name":"Art Deco","id":"7136289000003538769","color_code":null}],"Cart_Added_At":"2026-06-03T14:37:05+03:00"},{"price":"١٤٤٤٠","details":"وزن الذهب: 9.70 غ\nالماس (قيراط): RD 1.01 ق\nلون الذهب: وردي\nقابلة للتعديل: نعم\nصُنع في: إيطاليا","description":"قلادة كوكوبيللي الماسية - صغيرة مصممة من ذهب 18 قيراط وردي اللون بوزن 9.70 غرام. مصنوعة بعناية فائقة، تعكس الشخصية والبنية والتميز - مثالية لهواة الجمع والخبراء في الأشكال الرفيعة.","product_name":"قلادة كوكوبيللي الماسية، صغيرة","vendor":"Bijouq","product_code":"PN-2579","product_image":"https://cdn.shopify.com/s/files/1/0707/3991/9016/files/PN-2579_61dcf577-bcf7-4025-8858-8c1d51a935a1.jpg?v=1771780736","tag":[{"name":"Coccopelli","id":"7136289000003537655","color_code":null}],"Cart_Added_At":"2026-03-17T11:48:57+03:00"},{"price":"١٨٩٦٠","details":"وزن الذهب: 6.10 جرام\nالماس (قيراط): RD 0.67 CT، VS1-VS2، F/G. TE 3.90 CT\nلون الذهب: وردي\nغير قابلة للتعديل\nصنع في: إيطاليا","description":"متألقة بلا اعتذار، وبصمة كارلو بربريس اللافتة. مزينة بعين النمر الذهبية والماس المتلألئ.","product_name":"أقراط كيرل - الماس وعين النمر","vendor":"Carlo Barberis","product_code":"ER-3791","product_image":"https://cdn.shopify.com/s/files/1/0707/3991/9016/files/ER-3791_baceb448-586a-4d07-ab70-6a7b2be9b9f6.jpg?v=1754662937","tag":[{"name":"Curl","id":"7136289000003552188","color_code":null}],"Cart_Added_At":"2026-03-27T09:43:55+03:00"},{"price":"٧٤٦١","details":"وزن الذهب: 4.24 جرام\nألماس (قيراط): RD 0.31 CT، VVS-G. PRS 1.00 CT\nلون الذهب: وردي\nقابلية التعديل: لا\nالصنع في: إيطاليا","description":"تلتقي الهندسة بالعاطفة في هذه التحفة المنحوتة.","product_name":"خاتم مسألة ضوء - مالاكيت","vendor":"Luca Carati","product_code":"RN-4386","product_image":"https://cdn.shopify.com/s/files/1/0707/3991/9016/files/RN-4386_df897979-55af-4c2b-80ab-fc8724d140d7.jpg?v=1771778860","tag":[{"name":"A Matter of Light","id":"7136289000003548263","color_code":null}],"Cart_Added_At":"2026-03-30T12:40:15+03:00"},{"price":"٣٧٩٠","details":"وزن الذهب: 2.25 جرام\nالألماس (قيراط): RD 0.22 CT، VS-G.\nلون الذهب: أبيض\nقابل لتغيير الحجم: نعم\nصُنع في: إيطاليا","description":"خاتم بأظافر من حجر أخضر مصمم من ذهب عيار 18 قيراط وزن 2.25 جرام. مصنوع بعناية فائقة، يعكس الشخصية، البناء، والفردية—مثالي لهواة الجمع والذواقة للأشكال الراقية.","product_name":"خاتم بأظافر من حجر أخضر","vendor":"Bijouq","product_code":"NR-279","product_image":"https://cdn.shopify.com/s/files/1/0707/3991/9016/files/NR-279_jpg_08a6e55c-85d5-444a-836e-0757dd3a5705.jpg?v=1771912943","tag":[{"name":"Nail Rings","id":"7136289000003551247","color_code":null}],"Cart_Added_At":"2026-04-21T16:44:14+03:00"},{"price":"٣٧٩٠","details":"وزن الذهب: 2.25 جرام\nالألماس (قيراط): RD 0.22 CT، VS-G.\nلون الذهب: أبيض\nقابل لتغيير الحجم: نعم\nصُنع في: إيطاليا","description":"خاتم بأظافر من حجر أخضر مصمم من ذهب عيار 18 قيراط وزن 2.25 جرام. مصنوع بعناية فائقة، يعكس الشخصية، البناء، والفردية—مثالي لهواة الجمع والذواقة للأشكال الراقية.","product_name":"خاتم بأظافر من حجر أخضر","vendor":"Bijouq","product_code":"NR-279","product_image":"https://cdn.shopify.com/s/files/1/0707/3991/9016/files/NR-279_jpg_08a6e55c-85d5-444a-836e-0757dd3a5705.jpg?v=1771912943","tag":[{"name":"Nail Rings","id":"7136289000003551247","color_code":null}],"Cart_Added_At":"2026-04-21T16:44:14+03:00"},{"price":"٩٦٠٠","details":"وزن الذهب: 4.99 جم\nالألماس (قيراط): دائري 0.41 قيراط VS-G ؛ مرجان أبيض 0.50 قيراط\nلون الذهب: وردي\nقابل للتعديل: نعم\nصُنع في: إيطاليا","description":"خاتم ديكوه، مصنوع من ذهب وردي عيار 18 (4.99 جم)، مزين بألماس دائري بوزن 0.41 قيراط بدرجة نقاء VS-G ومرجان أبيض بوزن 0.50 قيراط وسط الخاتم - أناقة خالدة مع بريق راقٍ.","product_name":"خاتم ديكوه ألماس المرجان المفتوح","vendor":"Bijouq","product_code":"RN-7190","product_image":"https://cdn.shopify.com/s/files/1/0707/3991/9016/files/RN-7190_81ee7402-1a13-4374-a638-b262e1a5fa4c.jpg?v=1771780750","tag":[{"name":"Art Deco","id":"7136289000003538769","color_code":null}],"Cart_Added_At":"2026-06-02T09:12:10+03:00"},{"price":"٢٠٥٨٧","details":"وزن الذهب: 9.30 جم\nالماس (قيراط): RD 0.63 قيراط، VS1-VS2، F/G. MC 7.20 قيراط. EM 0.28 قيراط\nلون الذهب: أبيض\nقابل لتغيير المقاس: لا\nصنع في: إيطاليا","description":"أصداء التراث في كل وجه وشكل. مزين بالمالاكيت النابض بالحيوية.","product_name":"عقد نقاط الرقص - مالاكيت","vendor":"Carlo Barberis","product_code":"NK-2613","product_image":"https://cdn.shopify.com/s/files/1/0707/3991/9016/files/NK-2613_3ae43c84-232c-4c90-ae82-98cf6b66ee6f.jpg?v=1754662903","tag":[{"name":"Dancing Dots","id":"7136289000003537658","color_code":null}],"Cart_Added_At":"2026-06-02T09:43:48+03:00"},{"price":"١٢٣٤٨","details":"وزن الذهب: 6.06 ج\nالألماس (قيراط): RD 0.71 قيراط، VVS-G. MC 1.10 ج\nلون الذهب: وردي\nغير قابلة للتعديل\nصُنع في: إيطاليا\nيرجى ملاحظة أن وصف المنتج قد يختلف قليلاً حسب الحجم وتفاوتات الصنع.","description":"تعبير فريد عن الفن والذوق الرفيع.","product_name":"قلادة ناتورا - الملاكيت والألماس","vendor":"Luca Carati","product_code":"NK-2063","product_image":"https://cdn.shopify.com/s/files/1/0707/3991/9016/files/NK-2063_cd5a7591-0624-4cf7-bbc9-4280f6e5c741.jpg?v=1754718841","tag":[{"name":"Natura","id":"7136289000003524793","color_code":null}],"Cart_Added_At":"2026-06-02T10:19:55+03:00"},{"price":"٨٧٧٥","details":"وزن الذهب: 4.79 جرام\nالماس (القيراط): RD 0.53 CT، VVS-G\nلون الذهب: وردي\nقابل للتعديل: لا\nصُنع في: إيطاليا\n\nيرجى ملاحظة أن أوصاف المنتجات قد تختلف قليلاً حسب الحجم وتفاوتات الصنعة.","description":"تدفق من الأناقة المصقولة تتدلى بسحر خالد.","product_name":"قلادة نجم آرت ديكو","vendor":"Luca Carati","product_code":"NK-2503","product_image":"https://cdn.shopify.com/s/files/1/0707/3991/9016/files/NK-2503_d612fd3f-98d5-414c-824a-8ed07009ad12.jpg?v=1754718837","tag":[{"name":"Art Deco","id":"7136289000003538769","color_code":null}],"Cart_Added_At":"2026-06-02T11:02:54+03:00"},{"price":"٨٥٢٠","details":"وزن الذهب: 13.25 ج\nالألماس (القيراط): RD 57 قطعة، 0.73 CT، VS-G\nلون الذهب: أبيض\nقابلية التعديل: لا\nالصنع في: إيطاليا\n\nيرجى ملاحظة أن أوصاف المنتجات قد تختلف قليلاً حسب الحجم وتفاوتات الصنعة.","description":"إبداع من جيلورو بتناغم خالص — عقد من الزهور الرقيقة التي تجسد الأناقة في كل تفصيل.","product_name":"قلادة كالّا، طراز L","vendor":"Giloro","product_code":"NK-3335","product_image":"https://cdn.shopify.com/s/files/1/0707/3991/9016/files/NK-3335_d8bf6534-6199-4bb3-9e0c-abb7a2239b7e.jpg?v=1771750518","tag":[{"name":"Calla","id":"7136289000003539533","color_code":null}],"Cart_Added_At":"2026-07-02T16:41:48+03:00"},{"price":"٧١٦٤","details":"وزن الذهب: 6.04 ج\nالألماس (القيراط): ماركيز 0.39 قيراط، VS-G. برينسيس 0.12 قيراط، VS-G\nلون الذهب: وردي\nقابل للتعديل: لا\nمصنوع في: إيطاليا","description":"إسوارة أنيقة من الذهب الوردي عيار 18 قيراط، تتميز بألماس مقطع ماركيز ومقطع برينسيس بدرجة نقاء VS-G لتألق راقٍ.","product_name":"الإسوارة الحريرية الأنيقة مع الألماس","vendor":"Cashmere","product_code":"BN-1495","product_image":"https://cdn.shopify.com/s/files/1/0707/3991/9016/files/BN-1495_9efd1778-fa17-454c-85c8-c9503a998c54.png?v=1762088927","tag":[{"name":"Silk","id":"7136289000003545258","color_code":null}],"Cart_Added_At":"2026-07-04T11:02:47+03:00"},{"price":"١٥٥٥٠","details":"وزن الذهب: 5.55 جم\nالألماس (القيراط): RD 0.84 CT,VS1-VS2,F/G.MC 2.75 CT\nلون الذهب: وردي\nقابل لتعديل المقاس: لا\nصنع في: إيطاليا","description":"جريء ودقيق في آن واحد - مستوحى من الطبيعة وصقله الحرفيون ببراعة. مزين بملكيت نابض بالحياة.","product_name":"خاتم ديزي - ملكيت","vendor":"Carlo Barberis","product_code":"RN-4635","product_image":"https://cdn.shopify.com/s/files/1/0707/3991/9016/files/RN-4635_96dd3269-f2e1-4445-8896-aa88d7f39f3e.jpg?v=1754662949","tag":[{"name":"Daisy","id":"7136289000003546262","color_code":null}],"Cart_Added_At":"2026-07-06T10:43:36+03:00"}];
+
+        function handleModalBackdropClick(e) { if (e.target === document.getElementById('actionModal')) closeModal(); }
+        function handlePopupBackdropClick(e) { if (e.target === document.getElementById('luxuryPopup')) closeLuxuryPopup(); }
+
+        function getDeviceFingerprint() {
+            var components = [navigator.userAgent, navigator.language, screen.width + 'x' + screen.height, screen.colorDepth, new Date().getTimezoneOffset(), navigator.hardwareConcurrency || '', navigator.deviceMemory || '', navigator.platform || ''].join('|');
+            var hash = 0;
+            for (var i = 0; i < components.length; i++) { hash = ((hash << 5) - hash) + components.charCodeAt(i); hash |= 0; }
+            return Math.abs(hash).toString(36);
+        }
+
+        window.onload = () => {
+            const vw = window.innerWidth;
+            const vh = window.innerHeight;
+            
+            updateCartUI();
+
+            if (vw > 900) {
+                const SPREAD_RATIO = 733 / 1100;
+                const maxW = Math.floor(vw * 0.90);
+                const maxH = Math.floor(vh * 0.90);
+                let bookW = maxW; let bookH = Math.round(bookW * SPREAD_RATIO);
+                if (bookH > maxH) { bookH = maxH; bookW = Math.round(bookH / SPREAD_RATIO); }
+                if (bookW % 2 !== 0) bookW--;
+                const pageW = bookW / 2;
+
+                const flipbookEl = document.getElementById('flipbook');
+                flipbookEl.style.width  = bookW + 'px';
+                flipbookEl.style.height = bookH + 'px';
+                flipbookEl.style.margin = '0 auto';
+                flipbookEl.style.position = 'relative';
+
+                document.querySelectorAll('.desktop-wrapper .page').forEach(p => {
+                    p.style.width  = pageW + 'px';
+                    p.style.height = bookH + 'px';
+                });
+
+                pf = new St.PageFlip(flipbookEl, {
+                    width: pageW, height: bookH,
+                    minWidth: pageW, minHeight: bookH,
+                    maxWidth: pageW, maxHeight: bookH,
+                    size: 'fixed', showCover: true, autoSize: false, drawShadow: true, flippingTime: 1000, usePortrait: false, startPage: 0
+                });
+                pf.loadFromHTML(document.querySelectorAll('.desktop-wrapper .page'));
+            } else {
+                const maxW = Math.floor(vw * 0.95);
+                const maxH = Math.floor(vh * 0.92);
+                const flipbookEl = document.getElementById('mobile-flipbook');
+                flipbookEl.style.width  = maxW + 'px';
+                flipbookEl.style.height = maxH + 'px';
+
+                document.querySelectorAll('.mobile-wrapper .page').forEach(p => {
+                    p.style.width  = maxW + 'px';
+                    p.style.height = maxH + 'px';
+                });
+
+                pfMobile = new St.PageFlip(flipbookEl, {
+                    width: maxW, height: maxH,
+                    minWidth: maxW, minHeight: maxH,
+                    maxWidth: maxW, maxHeight: maxH,
+                    size: 'fixed', showCover: true, autoSize: false, drawShadow: true, flippingTime: 800, swipeDistance: 30, startPage: 0, clickEventForward: false, useMouseEvents: false
+                });
+                pfMobile.loadFromHTML(document.querySelectorAll('.mobile-wrapper .page'));
+
+                document.getElementById('mobile-prev').onclick = () => pfMobile.flipPrev();
+                document.getElementById('mobile-next').onclick = () => pfMobile.flipNext();
+
+                pfMobile.on('flip', (e) => {
+                    if (e.data === 0) document.body.classList.add('on-cover');
+                    else document.body.classList.remove('on-cover');
+                });
+                document.body.classList.add('on-cover');
+            }
+
+            // Hide loading screen
+            setTimeout(() => {
+                const loader = document.getElementById('loading-screen');
+                loader.style.opacity = '0';
+                setTimeout(() => { loader.style.display = 'none'; }, 800);
+            }, 1500);
+        };
+
+        function updateCartUI() {
+            const desktopContainer = document.getElementById('cart-container-desktop');
+            const mobileContainer = document.getElementById('cart-container-mobile');
+            
+            const cartHTML = cartData.length > 0 ? cartData.map((item, idx) => `
+                <div class="cart-item" onclick="showLuxuryProduct(${idx})">
+                    <div class="cart-item-img" style="background-image: url('${item.product_image}')"></div>
+                    <div class="cart-item-info">
+                        <h4>${item.product_name}</h4>
+                        <p>QAR ${item.price}</p>
+                        <div class="cart-item-actions">
+                            <button onclick="event.stopPropagation(); handleAction('Advisor', '${item.product_code}', '${item.product_name}', '${item.vendor}')" class="cart-btn">Advisor</button>
+                            <button onclick="event.stopPropagation(); handleAction('Buy Now', '${item.product_code}', '${item.product_name}', '${item.vendor}')" class="cart-btn gold">Buy Now</button>
+                        </div>
+                    </div>
+                </div>
+            `).join('') : '<p class="empty-msg">مجموعتك بانتظار أن تكتشفها.</p>';
+
+            if (desktopContainer) desktopContainer.innerHTML = cartHTML;
+            if (mobileContainer) mobileContainer.innerHTML = cartHTML;
+        }
+
+        function showLuxuryProduct(idx) {
+    if (pf) popupReturnPageDesktop = pf.getCurrentPageIndex();
+    if (pfMobile) popupReturnPageMobile = pfMobile.getCurrentPageIndex();
+
+    const item = cartData[idx];
+    const popup = document.getElementById('luxuryPopup');
+    const inner = document.getElementById('luxuryPopupInner');
+    
+    inner.innerHTML = `
+        <button class="luxury-close" onclick="closeLuxuryPopup()">&times;</button>
+        <div class="luxury-popup-img" style="background-image: url('${item.product_image}')"></div>
+        <div class="luxury-popup-details">
+            <span class="exquisite-label">${(item.tag && item.tag[0] && item.tag[0].name) || 'COLLECTION'}</span>
+            <h2 class="product-title">${item.product_name}</h2>
+            <p class="product-ref">REF: ${item.product_code}</p>
+            <div class="gold-accent-line"></div>
+            <div class="narrative-box">
+                <label>القطعة</label>
+                <p>${item.description}</p>
+                <label>التفاصيل</label>
+                <p>${item.details ? item.details.replace(/\n/g, '<br>') : 'متوفر حصرياً لدى مجوهرات الماسة الزرقاء.'}</p>
+            </div>
+            <div class="price-container">ر.ق ${item.price}</div>
+            <div class="button-group">
+                <button onclick="handleAction('Advisor', '${item.product_code}', '${item.product_name}', '${item.vendor}')" class="btn btn-primary">تحدث مع مستشار</button>
+                <button onclick="handleAction('Buy Now', '${item.product_code}', '${item.product_name}', '${item.vendor}')" class="btn btn-secondary">اشترِ الآن</button>
+            </div>
+        </div>
+    `;
+    popup.style.display = 'flex';
+}
+
+function closeLuxuryPopup() { 
+    document.getElementById('luxuryPopup').style.display = 'none';
+
+    if (pf && popupReturnPageDesktop !== null) {
+        pf.flip(popupReturnPageDesktop);
+    }
+
+    if (pfMobile && popupReturnPageMobile !== null) {
+        pfMobile.flip(popupReturnPageMobile);
+    }
+}
+
+        function handleAction(type, code, name, vendor) {
+            const savedData = localStorage.getItem('bd_user_info');
+            const userInfo = savedData ? JSON.parse(savedData) : null;
+            
+            if (type === 'Advisor') {
+                showSmartForm(type, code, name, vendor, false);
+                return;
+            }
+            
+            if (!userInfo || !userInfo.name || !userInfo.phone) {
+                showSmartForm(type, code, name, vendor, type === 'Add to Bag');
+            } else {
+                if (type === 'Add to Bag') {
+                    const product = catalogueProducts.find(p => p.product_code === code);
+                    if (product) {
+                        const exists = cartData.some(item => item.product_code === code);
+                        if (!exists) {
+                            cartData.push(product);
+                            updateCartUI();
+                        }
+                    }
+                }
+                sendAction(type, code, name, vendor, userInfo);
+            }
+        }
+
+        function toggleCustomCountry() {
+            const select = document.getElementById('formCountryCode');
+            const customRow = document.getElementById('customCountryCodeRow');
+            customRow.style.display = select.value === 'CUSTOM' ? 'block' : 'none';
+        }
+
+        function showSmartForm(type, code, name, vendor, isAddToCart = false) {
+            currentPendingAction = { type, code, name, vendor };
+            const modal = document.getElementById('actionModal');
+            const inner = document.getElementById('modalInner');
+            const savedData = localStorage.getItem('bd_user_info');
+            const userInfo = savedData ? JSON.parse(savedData) : { name: '', phone: '', countryCode: '+974', brands: [], stone: '' };
+            
+            let formTitle = "تواصل مع المستشار";
+            let formDesc = "يرجى تأكيد بياناتك للحصول على استشارة مخصصة تليق بك.";
+            
+            if (type === 'Buy Now') {
+                formTitle = "شراء آمن";
+                formDesc = "يرجى تزويدنا بتفاصيل الاتصال الخاصة بك لإتمام عملية الشراء.";
+            } else if (type === 'Add to Bag') {
+                formTitle = "إضافة إلى المجموعة";
+                formDesc = "يرجى تزويدنا بتفاصيل الاتصال الخاصة بك لحفظ هذه القطعة في حقيبتك.";
+            }
+
+            const brands = ["Bijouq", "J Jewels", "Palmyra", "Noi", "Giloro", "Carlo Barberis", "Cashmere", "Luca Carati", "All Brands"];
+            const brandCheckboxes = brands.map(b => `<label class="brand-option"><input type="checkbox" name="brands" value="${b}" ${userInfo.brands && userInfo.brands.includes(b) ? 'checked' : ''}> ${b}</label>`).join('');
+
+            const isSimplified = type === 'Buy Now' || type === 'Add to Bag';
+
+            inner.innerHTML = `
+                <button class="modal-x-close" onclick="closeModal()" aria-label="Close">&times;</button>
+                <h3>${formTitle}</h3>
+                <p>${formDesc}</p>
+                <form class="smart-form" onsubmit="submitSmartForm(event)">
+                   <div class="form-group"><label>الاسم الكامل</label><input type="text" id="formName" required placeholder="أدخل اسمك" value="${userInfo.name || ''}"></div>
+                    <div class="form-group">
+                        <label>رقم الاتصال</label>
+                        <div class="phone-input-container">
+                            <select id="formCountryCode" onchange="toggleCustomCountry()">
+                                <option value="+974" ${userInfo.countryCode === '+974' ? 'selected' : ''}>QA +974</option>
+                                <option value="+971" ${userInfo.countryCode === '+971' ? 'selected' : ''}>AE +971</option>
+                                <option value="+966" ${userInfo.countryCode === '+966' ? 'selected' : ''}>SA +966</option>
+                                <option value="+965" ${userInfo.countryCode === '+965' ? 'selected' : ''}>KW +965</option>
+                                <option value="+968" ${userInfo.countryCode === '+968' ? 'selected' : ''}>OM +968</option>
+                                <option value="+973" ${userInfo.countryCode === '+973' ? 'selected' : ''}>BH +973</option>
+                                <option value="+1" ${userInfo.countryCode === '+1' ? 'selected' : ''}>US +1</option>
+                                <option value="+44" ${userInfo.countryCode === '+44' ? 'selected' : ''}>UK +44</option>
+                                <option value="+91" ${userInfo.countryCode === '+91' ? 'selected' : ''}>IN +91</option>
+                                <option value="+33" ${userInfo.countryCode === '+33' ? 'selected' : ''}>FR +33</option>
+                                <option value="+49" ${userInfo.countryCode === '+49' ? 'selected' : ''}>DE +49</option>
+                                <option value="+81" ${userInfo.countryCode === '+81' ? 'selected' : ''}>JP +81</option>
+                                <option value="CUSTOM">آخر...</option>
+                            </select>
+                            <input type="tel" id="formPhone" required placeholder="رقم الهاتف" value="${userInfo.phone || ''}">
+                        </div>
+                        <div id="customCountryCodeRow"><input type="text" id="formCustomCountry" placeholder="أدخل رمز الدولة (مثال: 39+)"></div>
+                    </div>
+                    ${!isSimplified ? `
+                    <div class="form-group"><label>العلامات التجارية المفضلة</label><div class="brand-grid">${brandCheckboxes}</div></div>
+                    <div class="form-group">
+                        <label>الحجر المفضّل <span class="optional-tag">(Optional)</span></label>
+                        <input type="text" id="formStone" placeholder="أدخل نوع الحجر المفضّل" value="${userInfo.stone || ''}">
+                    </div>
+                    <div class="form-group">
+                        <label>المناسبة <span class="optional-tag">(Optional)</span></label>
+                        <select id="formOccasion">
+    <option value="">اختر المناسبة</option>
+    <option value="Wedding">زفاف</option>
+    <option value="Anniversary">ذكرى سنوية</option>
+    <option value="Birthday">عيد ميلاد</option>
+    <option value="Gift">هدية</option>
+    <option value="Investment">استثمار</option>
+    <option value="Other">أخرى</option>
+                       </select>
+                    </div>
+                    ` : ''}
+                    <button type="submit" class="form-submit">${isAddToCart ? 'Add to Bag' : 'Confirm'}</button>
+                </form>
+            `;
+            modal.style.display = 'flex';
+        }
+
+        function submitSmartForm(event) {
+            event.preventDefault();
+            const countrySelect = document.getElementById('formCountryCode');
+            let countryCode = countrySelect.value === 'CUSTOM' ? document.getElementById('formCustomCountry').value || '' : countrySelect.value;
+            
+            const brandEls = document.querySelectorAll('input[name="brands"]:checked');
+            const selectedBrands = brandEls.length > 0 ? Array.from(brandEls).map(cb => cb.value) : [];
+            
+            const stoneEl = document.getElementById('formStone');
+            const occasionEl = document.getElementById('formOccasion');
+            
+            const userInfo = { 
+                name: document.getElementById('formName').value, 
+                phone: document.getElementById('formPhone').value, 
+                countryCode: countryCode, 
+                brands: selectedBrands, 
+                stone: stoneEl ? stoneEl.value : '', 
+                occasion: occasionEl ? occasionEl.value : '' 
+            };
+            
+            localStorage.setItem('bd_user_info', JSON.stringify({ 
+                name: userInfo.name, 
+                phone: userInfo.phone, 
+                countryCode: userInfo.countryCode, 
+                brands: userInfo.brands, 
+                stone: userInfo.stone 
+            }));
+            
+            if (currentPendingAction) {
+                if (currentPendingAction.type === 'Add to Bag') {
+                    const product = catalogueProducts.find(p => p.product_code === currentPendingAction.code);
+                    if (product) {
+                        const exists = cartData.some(item => item.product_code === currentPendingAction.code);
+                        if (!exists) {
+                            cartData.push(product);
+                            updateCartUI();
+                        }
+                    }
+                }
+                sendAction(currentPendingAction.type, currentPendingAction.code, currentPendingAction.name, currentPendingAction.vendor, userInfo);
+            }
+        }
+
+        async function sendAction(type, code, name, vendor, userInfo = {}) {
+            const modal = document.getElementById('actionModal');
+            const inner = document.getElementById('modalInner');
+            
+            let title = "تم إرسال الطلب";
+        let message = "شكراً لكم، " + (userInfo.name || 'عميلنا العزيز') + ". تم إبلاغ المستشار باهتمامكم بـ " + name + " (" + code + "). وسيتواصل معكم قريباً.";
+            
+            if (type === 'Add to Bag') {
+            title = "تمت الإضافة إلى الحقيبة";
+            message = "تمت إضافة " + name + " إلى اختياراتكم. يمكنكم استعراضها في حقيبتكم بنهاية الكتالوج.";
+        } else if (type === 'Buy Now') {
+            title = "جاري معالجة الطلب";
+            message = "نحن نجهز طلبكم لـ " + name + ". سيتواصل معكم مسؤول خدماتنا لإتمام عملية الدفع والتوصيل.";
+        }
+
+            inner.innerHTML = `<button class="modal-x-close" onclick="closeModal()" aria-label="Close">&times;</button><h3>${title}</h3><p>${message}</p><button class="modal-close" onclick="closeModal()">إغلاق</button>`;
+            modal.style.display = 'flex';
+            
+            try {
+                await fetch('https://n8n.srv1138489.hstgr.cloud/webhook/explore-brands-arabic', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: type, productCode: code, productName: name, vendor: vendor, pageUrl: window.location.href, deviceFingerprint: getDeviceFingerprint(), customerName: userInfo.name || null, customerPhone: (userInfo.countryCode || '') + (userInfo.phone || ''), preferredBrands: userInfo.brands || [], stonePreference: userInfo.stone || null, occasion: userInfo.occasion || null, timestamp: new Date().toISOString() }) });
+            } catch (error) { console.error("Error sending webhook:", error); }
+            if (window.parent && window.parent.postMessage) window.parent.postMessage({ type, productCode: code, productName: name, vendor, userInfo }, '*');
+        }
+
+        function closeModal() { document.getElementById('actionModal').style.display = 'none'; }
+    </script>
+</body>
+</html>
